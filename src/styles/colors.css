@@ -1,0 +1,9 @@
+
+/* Mossy hollow — 전역 색상 토큰 */
+/* 사용 예시: color: var(--mossy-olive); */
+:root {
+  --mossy-olive: #636b2f;
+  --mossy-sage: #bac095;
+  --mossy-lime: #d4de95;
+  --mossy-forest: #3d4127;
+}
