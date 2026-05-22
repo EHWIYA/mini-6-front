@@ -13,6 +13,7 @@ function BookDetailPage({ mode, bookId, onGoList }) {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [author, setAuthor] = useState("");
 
   useEffect(() => {
     if (isCreate) return;
@@ -24,6 +25,7 @@ function BookDetailPage({ mode, bookId, onGoList }) {
 
       setTitle(book.title);
       setContent(book.content);
+      setAuthor(book.author);
     };
 
     fetchBook();
@@ -33,7 +35,7 @@ function BookDetailPage({ mode, bookId, onGoList }) {
     await BookCreate({
       title,
       content,
-      author: "",
+      author,
       coverImageUrl: "",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -46,6 +48,7 @@ function BookDetailPage({ mode, bookId, onGoList }) {
     await BookUpdate(bookId, {
       title,
       content,
+      author,
       updatedAt: new Date().toISOString(),
     });
 
@@ -86,6 +89,14 @@ function BookDetailPage({ mode, bookId, onGoList }) {
               onChange={(e) => setTitle(e.target.value)}
             />
           </label>
+          <label>
+            작가
+            <textarea
+              placeholder="작가"
+              value={author}
+              onChange={(e) => setAuthor(e.target.value)}
+            />
+          </label>
 
           <label>
             도서 내용
@@ -97,15 +108,21 @@ function BookDetailPage({ mode, bookId, onGoList }) {
           </label>
 
           {/* CRUD 버튼 */}
-          <button type="button" disabled={isCreate} onClick={handleDelete}>
-            삭제
-          </button>
-          <button type="button" disabled={isCreate} onClick={handleUpdate}>
-            수정하기
-          </button>
-          <button type="button" disabled={!isCreate} onClick={handleCreate}>
-            등록하기
-          </button>
+          {isCreate ? (
+            <button type="button" onClick={handleCreate}>
+              등록하기
+            </button>
+          ) : (
+            <>
+              <button type="button" onClick={handleDelete}>
+                삭제
+              </button>
+              <button type="button" onClick={handleUpdate}>
+                수정하기
+              </button>
+            </>
+          )}
+          
         </section>
 
         {/* 우측: AI 표지 생성 패널 */}
