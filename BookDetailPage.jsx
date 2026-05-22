@@ -1,10 +1,4 @@
-import { useEffect, useState } from "react";
-import {
-  BookDetail,
-  BookCreate,
-  BookDelete,
-  BookUpdate
-} from "../api/bookApi";
+import { useState } from "react";
 
 function BookDetailPage({ mode, bookId, onGoList }) {
   const isCreate = mode === "create";
@@ -19,50 +13,6 @@ function BookDetailPage({ mode, bookId, onGoList }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (isCreate) return;
-
-    const fetchBook = async () => {
-      const book = await BookDetail(bookId);
-
-      if (!book) return;
-
-      setTitle(book.title);
-      setContent(book.content);
-      setAuthor(book.author);
-    };
-
-    fetchBook();
-  }, [isCreate, bookId]);
-
-  const handleCreate = async () => {
-    await BookCreate({
-      title,
-      content,
-      author,
-      coverImageUrl: "",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    });
-
-    onGoList();
-  };
-
-  const handleUpdate = async () => {
-    await BookUpdate(bookId, {
-      title,
-      content,
-      author,
-      updatedAt: new Date().toISOString(),
-    });
-
-    onGoList();
-  };
-
-  const handleDelete = async () => {
-    await BookDelete(bookId);
-    onGoList();
-  };
   const handleGenerateCover = async () => {
     if (!title || !content) {
       alert("도서 제목과 도서 내용을 입력해주세요.");
@@ -177,9 +127,10 @@ ${content}
           </label>
 
           <label>
-            작가
-            <textarea
-              placeholder="작가"
+            저자
+            <input
+              type="text"
+              placeholder="저자"
               value={author}
               onChange={(e) => setAuthor(e.target.value)}
             />
@@ -194,22 +145,15 @@ ${content}
             />
           </label>
 
-          {/* CRUD 버튼 */}
-          {isCreate ? (
-            <button type="button" onClick={handleCreate}>
-              등록하기
-            </button>
-          ) : (
-            <>
-              <button type="button" onClick={handleDelete}>
-                삭제
-              </button>
-              <button type="button" onClick={handleUpdate}>
-                수정하기
-              </button>
-            </>
-          )}
-          
+          <button type="button" disabled={isCreate}>
+            삭제
+          </button>
+          <button type="button" disabled={isCreate}>
+            수정하기
+          </button>
+          <button type="button" onClick={handleCreateBook}>
+            등록하기
+          </button>
         </section>
 
         <section>
@@ -255,4 +199,5 @@ ${content}
     </div>
   );
 }
+
 export default BookDetailPage;

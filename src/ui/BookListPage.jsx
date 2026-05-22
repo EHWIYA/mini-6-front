@@ -1,6 +1,19 @@
 // 도서 목록 페이지
+import { useEffect, useState } from "react";
+import { BookList } from "../api/bookApi";
 
 function BookListPage({ onGoRegister, onGoDetail }) {
+  const [books, setBooks] = useState([]);
+
+  useEffect(() => {
+    const fetchBooks = async () => {
+      const data = await BookList();
+      setBooks(data);
+    };
+
+    fetchBooks();
+  }, []);
+  
   return (
     <div>
       {/* 공통 헤더 */}
@@ -18,10 +31,16 @@ function BookListPage({ onGoRegister, onGoDetail }) {
         {/* 도서 카드 목록 영역 */}
         <section>
           <p>도서 카드 목록 영역 (3열 그리드)</p>
-          {/* 상세페이지 이동(임시로 1번) */}
-          <button type="button" onClick={() => onGoDetail(1)}>
-            샘플 도서 카드 클릭 (id: 1)
-          </button>
+
+          {books.map((book) => (
+            <button
+              key={book.id}
+              type="button"
+              onClick={() => onGoDetail(book.id)}
+            >
+              {book.title}
+            </button>
+          ))}
         </section>
       </main>
     </div>
