@@ -1,9 +1,20 @@
-function Input() {
+import "./InputStyle.css";
+
+function Input({
+  label,
+  variant = "small",
+  name,
+  value,
+  onChange,
+  placeholder,
+}) {
   return (
-    <div>
-      {label && <label>{label}</label>}
+    <div className="input-box">
+      {label && <label className="input-label">{label}</label>}
+
       {variant === "large" ? (
         <textarea
+          className="input-field input-large"
           name={name}
           value={value}
           onChange={onChange}
@@ -11,6 +22,7 @@ function Input() {
         />
       ) : (
         <input
+          className="input-field input-small"
           name={name}
           value={value}
           onChange={onChange}
@@ -20,4 +32,5 @@ function Input() {
     </div>
   );
 }
+
 export default Input;
