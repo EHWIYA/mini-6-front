@@ -28,6 +28,18 @@ function BookDetailPage({ mode, bookId, onGoList, onGoRegister }) {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (isCreate) {
+      setTitle("");
+      setAuthor("");
+      setContent("");
+      setCoverImage("");
+      setApiKey("");
+      setApiKeyError("");
+      setError("");
+      setSelectedQuality("medium");
+      return;
+    }
+    
     if (isCreate || !bookId) return;
 
     const fetchBook = async () => {
