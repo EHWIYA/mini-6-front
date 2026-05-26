@@ -1,0 +1,29 @@
+@import "../../styles/comSt.css";
+
+.book-image-box {
+  width: 180px;
+  height: 140px;
+  border: 1px solid var(--border-image);
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: var(--bg-input);
+}
+
+.book-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.book-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: var(--bg-card);
+  color: var(--text-placeholder);
+  font-size: var(--font-small);
+}
