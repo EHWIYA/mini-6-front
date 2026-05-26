@@ -1,9 +1,9 @@
 @import "../../styles/comSt.css";
 
 .book-card {
-  width: 206px;
-  height: 316px;
-  padding: 16px;
+  width: 260px;
+  height: 380px;
+  padding: 10px;
   border: 1px solid var(--border-card);
   border-radius: 6px;
   background-color: var(--bg-input);

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import defaultBookImage from "../../assets/homz.png";
+import defaultBookImage from "../../assets/default.png";
 import "./BookImageStyle.css";
 
 function BookImage({ src, alt }) {

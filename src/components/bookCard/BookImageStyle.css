@@ -1,10 +1,10 @@
 @import "../../styles/comSt.css";
 
 .book-image-wrapper {
-  width: 180px;
-  height: 145px;
+  width: 200px;
+  height: 230px;
 
-  border: 1px solid var(--border-image);
+  border: 1px solid transparent;
   border-radius: 4px;
   overflow: hidden;
 
