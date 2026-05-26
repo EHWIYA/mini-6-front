@@ -55,6 +55,7 @@ function App() {
       mode={detailMode}
       bookId={selectedBookId}
       onGoList={goList}
+      onGoRegister={goRegister}
     />
   );
 }
