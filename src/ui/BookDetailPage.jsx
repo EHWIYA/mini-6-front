@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import { BookCreate, BookDetail, BookUpdate, BookDelete } from "../api/bookApi";
+
 import Header from "../components/Header";
 import BookForm from "../components/Form/Book/BookForm";
 import ImageForm from "../components/Form/AiImage/ImageForm";
-import { BookCreate, BookDetail, BookUpdate, BookDelete } from "../api/bookApi";
 import "./BookDetailPage.css";
 
 const INITIAL_BOOK_DATA = {
@@ -55,6 +56,15 @@ function BookDetailPage({ mode, bookId, onGoList, onGoRegister }) {
   }, [isCreate, bookId]);
 
   const handleSave = async () => {
+    if (
+      !bookData.title.trim() ||
+      !bookData.author.trim() ||
+      !bookData.content.trim()
+    ) {
+      alert("제목, 저자, 내용을 모두 입력해주세요.");
+      return;
+    }
+
     const now = new Date().toISOString();
 
     if (isCreate) {
@@ -141,24 +151,9 @@ function BookDetailPage({ mode, bookId, onGoList, onGoRegister }) {
       </main>
 
       {errorMessage && (
-        <div
-          className="bookDetailPage-modal-overlay"
-          role="presentation"
-          onClick={() => setErrorMessage("")}
-        >
-          <div
-            className="bookDetailPage-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="book-detail-modal-title"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <h2
-              id="book-detail-modal-title"
-              className="bookDetailPage-modal-title"
-            >
-              알림
-            </h2>
+        <div className="bookDetailPage-modal-overlay">
+          <div className="bookDetailPage-modal">
+            <h2 className="bookDetailPage-modal-title">알림</h2>
             <p className="bookDetailPage-modal-message">{errorMessage}</p>
             <button
               type="button"

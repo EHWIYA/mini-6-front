@@ -7,7 +7,7 @@ import "./ImageFormStyle.css";
 
 function ImageForm({ bookData, setBookData }) {
   const [apiKey, setApiKey] = useState("");
-  const [selectedQuality, setSelectedQuality] = useState("high");
+  const [selectedQuality, setSelectedQuality] = useState("medium");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -16,17 +16,10 @@ function ImageForm({ bookData, setBookData }) {
   const validateApiKey = (key) => {
     const trimmedKey = key.trim();
 
-    if (!trimmedKey) {
-      return "API Key를 입력해주세요.";
-    }
-
-    if (!trimmedKey.startsWith("sk-")) {
+    if (!trimmedKey) return "API Key를 입력해주세요.";
+    if (!trimmedKey.startsWith("sk-"))
       return "API Key 형식이 올바르지 않습니다.";
-    }
-
-    if (trimmedKey.length < 20) {
-      return "API Key가 너무 짧습니다.";
-    }
+    if (trimmedKey.length < 20) return "API Key가 너무 짧습니다.";
 
     return "";
   };
@@ -48,16 +41,52 @@ function ImageForm({ bookData, setBookData }) {
       setIsLoading(true);
       setErrorMsg("");
 
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const prompt = `
+책 제목: ${bookData.title}
+저자: ${bookData.author}
+
+책 내용:
+${bookData.content}
+
+위 내용을 바탕으로 상업용 도서 표지 이미지를 생성해줘.
+책 표지처럼 세련되고, 제목 분위기가 잘 드러나게 만들어줘.
+작은 글자나 읽기 어려운 텍스트는 넣지 말아줘.
+`;
+
+      const response = await fetch(
+        "https://api.openai.com/v1/images/generations",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify({
+            model: "gpt-image-2",
+            prompt,
+            size: "1024x1536",
+            quality: selectedQuality,
+          }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error?.message || "이미지 생성 실패");
+      }
+
+      const imageBase64 = data.data[0].b64_json;
 
       setBookData((prev) => ({
         ...prev,
-        coverImageUrl:
-          "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=500",
+        coverImageUrl: `data:image/png;base64,${imageBase64}`,
       }));
     } catch (error) {
       console.error(error);
-      setErrorMsg("이미지 생성에 실패했습니다. 다시 시도해주세요.");
+      setErrorMsg(
+        "이미지 생성에 실패했습니다. API Key 또는 네트워크 상태를 확인해주세요.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -82,7 +111,7 @@ function ImageForm({ bookData, setBookData }) {
             <p className="validation-error image-form-message">{errorMsg}</p>
           ) : hasApiKey ? (
             <p className="validation-success image-form-message">
-              유효한 API Key입니다!
+              API Key 형식이 확인되었습니다.
             </p>
           ) : (
             <p className="image-form-message image-form-message-empty">
@@ -133,7 +162,7 @@ function ImageForm({ bookData, setBookData }) {
             onClick={handleGenerateImage}
             disabled={isLoading}
           >
-            {isLoading ? "생성 중" : "이미지 생성"}
+            {isLoading ? "생성 중..." : "이미지 생성"}
           </MainButton>
         </div>
       </div>
