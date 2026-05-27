@@ -148,7 +148,8 @@ React 개발 서버와 json-server는 각각 별도 실행 필요
 
 ### 도서 목록
 
-<img width="60%" alt="image" src="https://github.com/user-attachments/assets/7801d2a9-64d4-4854-a6a4-5a6fb6bbe329" />
+<img width="60%" alt="image" src="https://github.com/user-attachments/assets/e6635cdd-2fef-473a-8ef1-b784206d62b9" />
+
 
 
 ### 도서 등록
