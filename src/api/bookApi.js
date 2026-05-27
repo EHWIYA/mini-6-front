@@ -130,7 +130,7 @@ export const BookSearch = async (keyword) => {
   }
 };
 
-// 조회수 증가: PATCH /books/{id}
+// 도서 조회수: PATCH /books/{id}
 export const BookViewCount = async (id, views) => {
   try {
     const res = await fetch(`${BASE_URL}/${id}`, {
