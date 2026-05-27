@@ -91,3 +91,26 @@ export const BookDelete = async (id) => {
     return false;
   }
 };
+
+// 도서 키워드 검색: GET /books?q={keyword}
+// title, author, content 등 모든 필드를 대상으로 부분 일치 검색
+export const BookSearch = async (keyword) => {
+  try {
+    if (!keyword || !keyword.trim()) {
+      return await BookList();
+    }
+
+    const res = await fetch(
+      `${BASE_URL}?q=${encodeURIComponent(keyword.trim())}`
+    );
+
+    if (!res.ok) {
+      throw new Error("도서 검색 실패");
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
