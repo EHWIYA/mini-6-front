@@ -10,6 +10,7 @@ import "./BookListPage.css";
 function BookListPage({ onGoList, onGoRegister, onGoDetail }) {
   const [books, setBooks] = useState([]);
   const [keyword, setKeyword] = useState("");
+  const [sortType, setSortType] = useState("latest");
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -30,6 +31,22 @@ function BookListPage({ onGoList, onGoRegister, onGoDetail }) {
     }
   };
 
+  const sortedBooks = [...books].sort((a, b) => {
+    if (sortType === "latest") {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    }
+
+    if (sortType === "oldest") {
+      return new Date(a.createdAt) - new Date(b.createdAt);
+    }
+
+    if (sortType === "title") {
+      return a.title.localeCompare(b.title);
+    }
+
+    return 0;
+  });
+  
   return (
     <div className="bookListPage">
       <Header
@@ -54,12 +71,20 @@ function BookListPage({ onGoList, onGoRegister, onGoDetail }) {
           </div>
         </section>
 
+        <div className="bookListPage-sort">
+          <select value={sortType} onChange={(e) => setSortType(e.target.value)}>
+            <option value="latest">최신순</option>
+            <option value="oldest">오래된순</option>
+            <option value="title">제목순</option>
+          </select>
+        </div>
+
         {/* 도서 리스트 영역 */}
         {books.length === 0 ? (
           <p className="bookListPage-empty">검색 결과가 없습니다.</p>
         ) : (
           <section className="bookListPage-grid">
-            {books.map((book) => (
+            {sortedBooks.map((book) => (
               <BookCard key={book.id} book={book} onClick={onGoDetail} />
             ))}
           </section>
