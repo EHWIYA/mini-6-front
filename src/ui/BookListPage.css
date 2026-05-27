@@ -77,3 +77,20 @@
     grid-template-columns: 230px;
   }
 }
+
+.bookListPage-sort {
+  width: 100%;
+  max-width: 870px;
+  margin: 0 auto 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.bookListPage-sort select {
+  padding: 7px 8px;
+  border: 1px solid #b8be8f;
+  border-radius: 6px;
+  background-color: #fff;
+  color: #343b23;
+  font-size: 15px;
+}
