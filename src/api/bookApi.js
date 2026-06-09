@@ -116,18 +116,14 @@ export const BookSearch = async (keyword) => {
 };
 
 // 도서 조회수: PATCH /books/{id}
-export const BookViewCount = async (id, views) => {
+export const BookViewCount = async (id) => {
   try {
     const res = await fetch(`${BASE_URL}/${id}/views`, {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        views: views + 1,
-      }),
-    });
-
+      });
+    if (!res.ok) {
+      throw new Error("조회수 증가 실패");
+    }
     return await res.json();
   } catch (error) {
     console.error(error);
@@ -141,7 +137,7 @@ export const BookCoverUpdate = async (id, coverImageUrl) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ coverImageUrl }),
+      body: JSON.stringify({ imageUrl: coverImageUrl }),
     });
 
     if (!res.ok) {
