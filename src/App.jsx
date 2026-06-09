@@ -12,10 +12,6 @@ function App() {
   const [selectedBookId, setSelectedBookId] = useState(null);
 
   // --- 라우트 ---
-  const goHome = () => {
-    setCurrentView("home");
-  };
-
   const goList = () => {
     setCurrentView("list");
   };
@@ -52,6 +48,7 @@ function App() {
 
   return (
     <BookDetailPage
+      key={`${detailMode}-${selectedBookId ?? "new"}`}
       mode={detailMode}
       bookId={selectedBookId}
       onGoList={goList}

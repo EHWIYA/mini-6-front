@@ -13,11 +13,21 @@ function BookListPage({ onGoList, onGoRegister, onGoDetail }) {
   const [sortType, setSortType] = useState("latest");
 
   useEffect(() => {
+    let ignore = false;
+
     const fetchBooks = async () => {
       const data = await BookList();
-      setBooks(data);
+
+      if (!ignore) {
+        setBooks(data);
+      }
     };
+
     fetchBooks();
+
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   const handleSearch = async () => {

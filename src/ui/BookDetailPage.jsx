@@ -23,9 +23,10 @@ function BookDetailPage({ mode, bookId, onGoList, onGoRegister }) {
 
   useEffect(() => {
     if (isCreate || !bookId) {
-      setBookData(INITIAL_BOOK_DATA);
       return;
     }
+
+    let ignore = false;
 
     const fetchBookDetail = async () => {
       try {
@@ -33,6 +34,8 @@ function BookDetailPage({ mode, bookId, onGoList, onGoRegister }) {
         setErrorMessage("");
 
         const data = await BookDetail(bookId);
+
+        if (ignore) return;
 
         if (!data) {
           setErrorMessage("도서 정보를 불러오지 못했습니다.");
@@ -48,14 +51,22 @@ function BookDetailPage({ mode, bookId, onGoList, onGoRegister }) {
         });
         await BookViewCount(bookId);
       } catch (error) {
+        if (ignore) return;
+
         console.error(error);
         setErrorMessage("도서 상세 정보를 불러오는 중 오류가 발생했습니다.");
       } finally {
-        setPageLoading(false);
+        if (!ignore) {
+          setPageLoading(false);
+        }
       }
     };
 
     fetchBookDetail();
+
+    return () => {
+      ignore = true;
+    };
   }, [isCreate, bookId]);
 
   const handleSave = async () => {
@@ -67,8 +78,6 @@ function BookDetailPage({ mode, bookId, onGoList, onGoRegister }) {
       alert("제목, 저자, 내용을 모두 입력해주세요.");
       return;
     }
-
-    const now = new Date().toISOString();
 
     if (isCreate) {
       const createdBook = await BookCreate({
