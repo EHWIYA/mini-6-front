@@ -1,30 +1,59 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Input from "../common/Input";
 import MainButton from "../comButton/MainButton";
 import SubButton from "../comButton/SubButton";
+import { createFeedback, getFeedbackByReviewId } from "../../api/feedbackApi";
 import { ADMIN_DISPLAY_NAME, verifyAdminPassword } from "../../constants/admin";
 import { formatDate } from "../../utils/reviewFormat";
 import "./AdminComment.css";
 
 /**
- * AdminComment — 관리자 댓글 (리뷰당 1개, 비밀번호 인증 후 작성)
+ * AdminComment — 리뷰 피드백(관리자 답변, 리뷰당 1개)
  *
- * [화면 상태]
- * - adminComment 있음 → 답변 표시
- * - 답변 없음 → ① 토글 ② 비밀번호 인증 ③ 답변 작성 (순차 진행)
- *
- * @param {string} reviewId
- * @param {{ content: string, createdAt: string } | null} adminComment
- * @param {(reviewId: string, content: string) => { success: boolean, message?: string }} onSubmit
+ * @param {number} reviewId
  */
-function AdminComment({ reviewId, adminComment, onSubmit }) {
+function AdminComment({ reviewId }) {
+  const [feedback, setFeedback] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [password, setPassword] = useState("");
   const [content, setContent] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  /** 폼 초기화 및 닫기 */
+  useEffect(() => {
+    let ignore = false;
+
+    const loadFeedback = async () => {
+      setLoading(true);
+      setLoadError("");
+
+      try {
+        const data = await getFeedbackByReviewId(reviewId);
+        if (!ignore) {
+          setFeedback(data);
+        }
+      } catch (error) {
+        console.error(error);
+        if (!ignore) {
+          setLoadError(error.message || "피드백을 불러오지 못했습니다.");
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadFeedback();
+
+    return () => {
+      ignore = true;
+    };
+  }, [reviewId]);
+
   const handleClose = () => {
     setIsOpen(false);
     setIsAuthenticated(false);
@@ -33,7 +62,6 @@ function AdminComment({ reviewId, adminComment, onSubmit }) {
     setErrorMessage("");
   };
 
-  /** 1단계: 관리자 비밀번호 인증 */
   const handleAuth = (e) => {
     e.preventDefault();
     setErrorMessage("");
@@ -53,8 +81,7 @@ function AdminComment({ reviewId, adminComment, onSubmit }) {
     setErrorMessage("");
   };
 
-  /** 2단계: 답변 등록 (비밀번호 통과 후에만 접근) */
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
 
@@ -63,32 +90,42 @@ function AdminComment({ reviewId, adminComment, onSubmit }) {
       return;
     }
 
-    const result = onSubmit(reviewId, content.trim());
+    setIsSubmitting(true);
 
-    if (!result.success) {
-      setErrorMessage(result.message || "답변 등록에 실패했습니다.");
-      return;
+    try {
+      const result = await createFeedback(reviewId, content.trim());
+      setFeedback(result);
+      handleClose();
+    } catch (error) {
+      console.error(error);
+      setErrorMessage(error.message || "답변 등록에 실패했습니다.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    handleClose();
   };
 
-  /* --- 이미 답변이 있는 경우: 읽기 전용 --- */
-  if (adminComment) {
+  if (loading) {
+    return <p className="adminComment adminComment--loading">피드백 확인 중...</p>;
+  }
+
+  if (loadError) {
+    return <p className="validation-error adminComment-message">{loadError}</p>;
+  }
+
+  if (feedback) {
     return (
       <div className="adminComment adminComment--display">
         <div className="adminComment-header">
           <span className="adminComment-label">{ADMIN_DISPLAY_NAME} 답변</span>
-          <time className="adminComment-date" dateTime={adminComment.createdAt}>
-            {formatDate(adminComment.createdAt)}
+          <time className="adminComment-date" dateTime={feedback.createdAt}>
+            {formatDate(feedback.createdAt)}
           </time>
         </div>
-        <p className="adminComment-content">{adminComment.content}</p>
+        <p className="adminComment-content">{feedback.content}</p>
       </div>
     );
   }
 
-  /* --- 답변 없음: 비밀번호 인증 → 답변 작성 (순차) --- */
   return (
     <div className="adminComment adminComment--form">
       {!isOpen ? (
@@ -146,10 +183,12 @@ function AdminComment({ reviewId, adminComment, onSubmit }) {
           )}
 
           <div className="adminComment-actions">
-            <SubButton type="button" onClick={handleClose}>
+            <SubButton type="button" onClick={handleClose} disabled={isSubmitting}>
               취소
             </SubButton>
-            <MainButton type="submit">답변 등록</MainButton>
+            <MainButton type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "등록 중..." : "답변 등록"}
+            </MainButton>
           </div>
         </form>
       )}

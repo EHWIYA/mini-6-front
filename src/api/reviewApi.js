@@ -1,138 +1,111 @@
-/**
- * reviewApi — 리뷰 CRUD (서버 연동 전 localStorage + mock 시드)
- *
- * [저장 방식]
- * - MOCK_REVIEWS: 초기 시드 데이터 (mockReviews.js)
- * - book-reviews: 사용자가 작성한 리뷰
- * - book-review-admin-comments: 시드 리뷰 등에 달린 관리자 댓글 override
- *
- * [향후]
- * - fetch 기반 REST API로 함수 시그니처만 유지하며 교체
- */
-import { MOCK_REVIEWS } from "../data/mockReviews";
+const BASE_URL = "http://localhost:8080";
 
-const STORAGE_KEY = "book-reviews";
-const ADMIN_COMMENTS_KEY = "book-review-admin-comments";
+const JSON_HEADERS = {
+  "Content-Type": "application/json",
+};
 
-/** localStorage에서 사용자 작성 리뷰 불러오기 */
-const loadStoredReviews = () => {
+const parseErrorMessage = async (res, fallback) => {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
+    const text = await res.text();
+    if (!text) {
+      return fallback;
+    }
+
+    try {
+      const data = JSON.parse(text);
+      return data.message || text;
+    } catch {
+      return text;
+    }
   } catch {
+    return fallback;
+  }
+};
+
+/** GET /books/{bookId}/reviews */
+export const getReviewsByBookId = async (bookId) => {
+  try {
+    const res = await fetch(`${BASE_URL}/books/${bookId}/reviews`);
+
+    if (!res.ok) {
+      throw new Error("리뷰 목록 조회 실패");
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error(error);
     return [];
   }
 };
 
-/** localStorage에 사용자 작성 리뷰 저장 */
-const saveStoredReviews = (reviews) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(reviews));
-};
-
-/** 시드 리뷰 관리자 댓글 override 불러오기 */
-const loadAdminCommentOverrides = () => {
+/** GET /books/{bookId}/reviews/rating */
+export const getBookRating = async (bookId) => {
   try {
-    const stored = localStorage.getItem(ADMIN_COMMENTS_KEY);
-    return stored ? JSON.parse(stored) : {};
-  } catch {
-    return {};
+    const res = await fetch(`${BASE_URL}/books/${bookId}/reviews/rating`);
+
+    if (!res.ok) {
+      throw new Error("평균 별점 조회 실패");
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error(error);
+    return 0;
   }
 };
 
-/** 시드 리뷰 관리자 댓글 override 저장 */
-const saveAdminCommentOverrides = (overrides) => {
-  localStorage.setItem(ADMIN_COMMENTS_KEY, JSON.stringify(overrides));
-};
+/** POST /books/{bookId}/reviews */
+export const createReview = async (bookId, { content, rating }) => {
+  const res = await fetch(`${BASE_URL}/books/${bookId}/reviews`, {
+    method: "POST",
+    headers: JSON_HEADERS,
+    body: JSON.stringify({ content, rating }),
+  });
 
-/** adminComment override를 반영한 리뷰 1건 */
-const applyAdminCommentOverride = (review, overrides) => {
-  if (Object.prototype.hasOwnProperty.call(overrides, review.id)) {
-    return { ...review, adminComment: overrides[review.id] };
-  }
-  return review;
-};
-
-/** 시드 + localStorage 리뷰를 합친 전체 목록 */
-const getAllReviews = () => {
-  const stored = loadStoredReviews();
-  const overrides = loadAdminCommentOverrides();
-  const seedIds = new Set(MOCK_REVIEWS.map((review) => review.id));
-  const userReviews = stored.filter((review) => !seedIds.has(review.id));
-
-  return [...MOCK_REVIEWS, ...userReviews].map((review) =>
-    applyAdminCommentOverride(review, overrides),
-  );
-};
-
-/**
- * bookId에 해당하는 리뷰 목록 조회 (최신순)
- * @param {number|string} bookId
- */
-export const getReviewsByBookId = (bookId) => {
-  return getAllReviews()
-    .filter((review) => String(review.bookId) === String(bookId))
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-};
-
-/**
- * 리뷰 등록
- * @param {number|string} bookId
- * @param {{ author: string, rating: number, content: string }} reviewInput
- */
-export const createReview = (bookId, reviewInput) => {
-  const review = {
-    id: `rev-${Date.now()}`,
-    bookId: Number(bookId) || bookId,
-    author: reviewInput.author.trim(),
-    rating: reviewInput.rating,
-    content: reviewInput.content.trim(),
-    createdAt: new Date().toISOString(),
-    adminComment: null,
-  };
-
-  const stored = loadStoredReviews();
-  stored.push(review);
-  saveStoredReviews(stored);
-
-  return review;
-};
-
-/**
- * 관리자 댓글 등록 (리뷰당 1개)
- * @param {string} reviewId
- * @param {string} content
- * @returns {{ success: boolean, message?: string }}
- */
-export const addAdminComment = (reviewId, content) => {
-  const review = getAllReviews().find((item) => item.id === reviewId);
-
-  if (!review) {
-    return { success: false, message: "리뷰를 찾을 수 없습니다." };
+  if (!res.ok) {
+    throw new Error(await parseErrorMessage(res, "리뷰 작성에 실패했습니다."));
   }
 
-  if (review.adminComment) {
-    return { success: false, message: "이미 관리자 답변이 등록된 리뷰입니다." };
+  return await res.json();
+};
+
+/** PATCH /reviews/{reviewId} */
+export const updateReview = async (reviewId, { content, rating }) => {
+  const res = await fetch(`${BASE_URL}/reviews/${reviewId}`, {
+    method: "PATCH",
+    headers: JSON_HEADERS,
+    body: JSON.stringify({ content, rating }),
+  });
+
+  if (!res.ok) {
+    throw new Error(await parseErrorMessage(res, "리뷰 수정에 실패했습니다."));
   }
 
-  const adminComment = {
-    content,
-    createdAt: new Date().toISOString(),
-  };
+  return await res.json();
+};
 
-  const stored = loadStoredReviews();
-  const storedIndex = stored.findIndex((item) => item.id === reviewId);
+/** DELETE /reviews/{reviewId} */
+export const deleteReview = async (reviewId) => {
+  const res = await fetch(`${BASE_URL}/reviews/${reviewId}`, {
+    method: "DELETE",
+  });
 
-  /* 사용자 작성 리뷰 → book-reviews에 직접 저장 */
-  if (storedIndex >= 0) {
-    stored[storedIndex].adminComment = adminComment;
-    saveStoredReviews(stored);
-    return { success: true };
+  if (!res.ok) {
+    throw new Error(await parseErrorMessage(res, "리뷰 삭제에 실패했습니다."));
   }
 
-  /* 시드 리뷰 → override 키에 저장 */
-  const overrides = loadAdminCommentOverrides();
-  overrides[reviewId] = adminComment;
-  saveAdminCommentOverrides(overrides);
+  return true;
+};
 
-  return { success: true };
+/** PATCH /reviews/{reviewId}/like */
+export const likeReview = async (reviewId) => {
+  const res = await fetch(`${BASE_URL}/reviews/${reviewId}/like`, {
+    method: "PATCH",
+  });
+
+  if (!res.ok) {
+    throw new Error(await parseErrorMessage(res, "좋아요 처리에 실패했습니다."));
+  }
+
+  return await res.json();
 };

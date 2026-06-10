@@ -38,6 +38,24 @@
   font-weight: 700;
 }
 
+.reviewSection-rating {
+  margin-left: auto;
+  font-size: 14px;
+  color: var(--primary);
+  letter-spacing: 0.5px;
+}
+
+.reviewSection-message {
+  margin: 0 0 16px;
+  text-align: center;
+  color: var(--text-placeholder);
+  font-size: var(--font-small);
+}
+
+.reviewSection-message--error {
+  color: var(--error, #d32f2f);
+}
+
 /* 본문 컨테이너 (배경 없음 — 페이지 배경과 동일) */
 .reviewSection-body {
   box-sizing: border-box;

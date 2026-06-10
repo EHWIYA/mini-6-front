@@ -7,9 +7,12 @@ export const formatDate = (isoString) => {
   });
 };
 
-/** rating 숫자를 ★/☆ 문자열로 변환 */
+/** rating 숫자를 ★/☆ + 소수 표시 문자열로 변환 */
 export const formatRating = (rating) => {
-  const filled = "★".repeat(rating);
-  const empty = "☆".repeat(5 - rating);
-  return filled + empty;
+  const value = Number(rating) || 0;
+  const rounded = Math.min(5, Math.max(0, Math.round(value)));
+  const filled = "★".repeat(rounded);
+  const empty = "☆".repeat(5 - rounded);
+
+  return `${filled}${empty} ${value.toFixed(1)}`;
 };

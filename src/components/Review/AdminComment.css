@@ -4,6 +4,11 @@
   margin-top: 16px;
 }
 
+.adminComment--loading {
+  font-size: 13px;
+  color: var(--text-placeholder);
+}
+
 /* --- 답변 표시 (왼쪽 accent만) --- */
 .adminComment--display {
   padding: 14px 0 14px 16px;

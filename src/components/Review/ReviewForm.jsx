@@ -4,7 +4,6 @@ import MainButton from "../comButton/MainButton";
 import "./ReviewForm.css";
 
 const INITIAL_FORM = {
-  author: "",
   rating: 0,
   content: "",
 };
@@ -12,35 +11,25 @@ const INITIAL_FORM = {
 /**
  * ReviewForm — 리뷰 작성 폼
  *
- * [입력 필드]
- * - author: 작성자 닉네임 (다른 사용자 시뮬레이션)
- * - rating: 별점 1~5
- * - content: 리뷰 본문
- *
- * @param {{ onSubmit: (formData: { author: string, rating: number, content: string }) => void }} props
+ * @param {{ onSubmit: (formData: { rating: number, content: string }) => Promise<void> }} props
  */
 function ReviewForm({ onSubmit }) {
   const [form, setForm] = useState(INITIAL_FORM);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  /** 텍스트 필드 변경 핸들러 */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
     setErrorMessage("");
   };
 
-  /** 별점 선택 핸들러 */
   const handleRatingSelect = (rating) => {
     setForm((prev) => ({ ...prev, rating }));
     setErrorMessage("");
   };
 
-  /** 폼 유효성 검사 */
   const validate = () => {
-    if (!form.author.trim()) {
-      return "닉네임을 입력해주세요.";
-    }
     if (form.rating < 1 || form.rating > 5) {
       return "별점을 선택해주세요.";
     }
@@ -50,8 +39,7 @@ function ReviewForm({ onSubmit }) {
     return "";
   };
 
-  /** 리뷰 등록 제출 */
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const error = validate();
@@ -60,29 +48,28 @@ function ReviewForm({ onSubmit }) {
       return;
     }
 
-    onSubmit({
-      author: form.author.trim(),
-      rating: form.rating,
-      content: form.content.trim(),
-    });
-
-    setForm(INITIAL_FORM);
+    setIsSubmitting(true);
     setErrorMessage("");
+
+    try {
+      await onSubmit({
+        rating: form.rating,
+        content: form.content.trim(),
+      });
+
+      setForm(INITIAL_FORM);
+    } catch (error) {
+      console.error(error);
+      setErrorMessage(error.message || "리뷰 등록에 실패했습니다.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <form className="reviewForm" onSubmit={handleSubmit}>
       <h3 className="reviewForm-title">리뷰 작성</h3>
 
-      <Input
-        label="닉네임:"
-        name="author"
-        value={form.author}
-        onChange={handleChange}
-        placeholder="닉네임을 입력해주세요."
-      />
-
-      {/* --- 별점 선택 (1~5) --- */}
       <div className="reviewForm-rating">
         <p className="reviewForm-ratingLabel">별점:</p>
         <div className="reviewForm-stars" role="radiogroup" aria-label="별점 선택">
@@ -94,6 +81,7 @@ function ReviewForm({ onSubmit }) {
               onClick={() => handleRatingSelect(star)}
               aria-label={`${star}점`}
               aria-checked={form.rating === star}
+              disabled={isSubmitting}
             >
               {star <= form.rating ? "★" : "☆"}
             </button>
@@ -115,7 +103,9 @@ function ReviewForm({ onSubmit }) {
       )}
 
       <div className="reviewForm-actions">
-        <MainButton type="submit">리뷰 등록</MainButton>
+        <MainButton type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "등록 중..." : "리뷰 등록"}
+        </MainButton>
       </div>
     </form>
   );
