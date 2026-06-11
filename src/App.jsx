@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Navigate, Route, Routes, useNavigate, useParams } from "react-router";
+import { Toaster } from "react-hot-toast";
 import HomePage from "./ui/HomePage";
 import BookListPage from "./ui/BookListPage";
 import BookDetailPage from "./ui/BookDetailPage";
@@ -71,7 +72,8 @@ function App() {
   };
 
   return (
-    // URL에 맞는 페이지 하나를 렌더링한다.
+    <>
+    <Toaster position="top-right" reverseOrder={false} />
     <Routes>
       {/* 홈 */}
       <Route path="/" element={<HomePage {...commonPageProps} />} />
@@ -102,6 +104,7 @@ function App() {
       {/* 정의되지 않은 주소는 홈으로 이동 */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </>
   );
 }
 
