@@ -46,7 +46,14 @@ const isSameGenre = (selectedGenre, genre) => {
   return normalizeForCompare(selectedName) === normalizeForCompare(genreName);
 };
 
-function GenreModal({ selectedGenre, onSelectGenre, onClose }) {
+function GenreModal({
+  selectedGenre,
+  onSelectGenre,
+  onClose,
+  allowCustomGenre = true,
+  title = "장르 선택",
+  description = "책의 분위기에 가장 가까운 장르를 골라주세요.",
+}) {
   const [genres, setGenres] = useState([]);
   const [pendingGenres, setPendingGenres] = useState(() => {
     if (selectedGenre?.isNew) {
@@ -316,8 +323,8 @@ function GenreModal({ selectedGenre, onSelectGenre, onClose }) {
       >
         <div className="genre-modal-header">
           <div>
-            <h3>장르 선택</h3>
-            <p>책의 분위기에 가장 가까운 장르를 골라주세요.</p>
+            <h3>{title}</h3>
+            <p>{description}</p>
           </div>
 
           <button
@@ -333,68 +340,70 @@ function GenreModal({ selectedGenre, onSelectGenre, onClose }) {
         <div className="genre-modal-content">
           {renderGenreList()}
 
-          <div className="genre-modal-custom-area">
-            {!isCustomOpen && (
-              <button
-                type="button"
-                className="genre-modal-custom-open-button"
-                disabled={isLoading || Boolean(loadError)}
-                onClick={() => setIsCustomOpen(true)}
-              >
-                + 직접 장르 추가
-              </button>
-            )}
+          {allowCustomGenre && (
+            <div className="genre-modal-custom-area">
+              {!isCustomOpen && (
+                <button
+                  type="button"
+                  className="genre-modal-custom-open-button"
+                  disabled={isLoading || Boolean(loadError)}
+                  onClick={() => setIsCustomOpen(true)}
+                >
+                  + 직접 장르 추가
+                </button>
+              )}
 
-            {isCustomOpen && (
-              <>
-                <div className="genre-modal-custom-form">
-                  <input
-                    className="genre-modal-custom-input"
-                    value={customGenre}
-                    onChange={(e) => {
-                      setCustomGenre(e.target.value);
-                      setSuggestedGenre("");
-                    }}
-                    onKeyDown={handleCustomGenreKeyDown}
-                    placeholder="새 장르를 입력해주세요."
-                    autoFocus
-                  />
+              {isCustomOpen && (
+                <>
+                  <div className="genre-modal-custom-form">
+                    <input
+                      className="genre-modal-custom-input"
+                      value={customGenre}
+                      onChange={(e) => {
+                        setCustomGenre(e.target.value);
+                        setSuggestedGenre("");
+                      }}
+                      onKeyDown={handleCustomGenreKeyDown}
+                      placeholder="새 장르를 입력해주세요."
+                      autoFocus
+                    />
 
-                  <button
-                    type="button"
-                    className="genre-modal-custom-add-button"
-                    onClick={handleCustomGenreAdd}
-                  >
-                    추가
-                  </button>
-                </div>
-
-                {suggestedGenre && (
-                  <div className="genre-modal-suggestion">
-                    <p>
-                      혹시 <strong>{suggestedGenre}</strong> 장르를 의미하셨나요?
-                    </p>
-
-                    <div className="genre-modal-suggestion-actions">
-                      <button
-                        type="button"
-                        onClick={handleUseSuggestedGenre}
-                      >
-                        {suggestedGenre} 선택
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={handleUseCustomGenreAnyway}
-                      >
-                        그대로 추가
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      className="genre-modal-custom-add-button"
+                      onClick={handleCustomGenreAdd}
+                    >
+                      추가
+                    </button>
                   </div>
-                )}
-              </>
-            )}
-          </div>
+
+                  {suggestedGenre && (
+                    <div className="genre-modal-suggestion">
+                      <p>
+                        혹시 <strong>{suggestedGenre}</strong> 장르를 의미하셨나요?
+                      </p>
+
+                      <div className="genre-modal-suggestion-actions">
+                        <button
+                          type="button"
+                          onClick={handleUseSuggestedGenre}
+                        >
+                          {suggestedGenre} 선택
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={handleUseCustomGenreAnyway}
+                        >
+                          그대로 추가
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
