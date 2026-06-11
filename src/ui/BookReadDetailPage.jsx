@@ -20,7 +20,6 @@ function BookReadDetailPage({
 
   useEffect(() => {
     if (!bookId) {
-      setErrorMessage("조회할 도서를 찾을 수 없습니다.");
       return;
     }
 
@@ -41,6 +40,9 @@ function BookReadDetailPage({
         }
 
         const viewedBook = await BookViewCount(bookId);
+
+        if (ignore) return;
+
         setBook({
           ...data,
           views: viewedBook?.views ?? (data.views || 0) + 1,
@@ -64,6 +66,7 @@ function BookReadDetailPage({
     };
   }, [bookId]);
 
+<<<<<<< HEAD
   const handleLike = async () => {
     if (!bookId) return;
 
@@ -77,6 +80,11 @@ function BookReadDetailPage({
         : prevBook
     );
   };
+=======
+  const displayedErrorMessage = bookId
+    ? errorMessage
+    : "조회할 도서를 찾을 수 없습니다.";
+>>>>>>> 44292714992db6ace0f454f0d93a1d80db4eae47
 
   return (
     <div className="bookReadDetailPage">
@@ -95,13 +103,13 @@ function BookReadDetailPage({
           </p>
         )}
 
-        {!pageLoading && errorMessage && (
+        {!pageLoading && displayedErrorMessage && (
           <p className="bookReadDetailPage-message bookReadDetailPage-message--error">
-            {errorMessage}
+            {displayedErrorMessage}
           </p>
         )}
 
-        {!pageLoading && !errorMessage && book && (
+        {!pageLoading && !displayedErrorMessage && book && (
           <article className="bookReadDetailPage-article">
             {/* 도서 정보(2열) + 리뷰 섹션(전체 너비)을 묶는 article */}
             {/* --- 도서 상세: 표지 + 메타 정보 (기존 2열 그리드) --- */}

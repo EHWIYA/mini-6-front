@@ -1,0 +1,37 @@
+.genre-select-button {
+  height: 30px;
+  min-width: 92px;
+  padding: 0 12px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  border: 1px solid var(--primary, #65702a);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--primary, #65702a);
+
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+
+.genre-select-button:hover {
+  background: rgba(101, 112, 42, 0.08);
+}
+
+.genre-select-button.selected {
+  background: var(--primary, #65702a);
+  color: var(--text-white, #ffffff);
+}
+
+.genre-select-arrow {
+  font-size: 11px;
+  line-height: 1;
+}

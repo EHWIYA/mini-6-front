@@ -1,122 +1,141 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Navigate, Route, Routes, useNavigate, useParams } from "react-router";
+import { Toaster } from "react-hot-toast";
 import HomePage from "./ui/HomePage";
 import BookListPage from "./ui/BookListPage";
 import BookDetailPage from "./ui/BookDetailPage";
 import BookReadDetailPage from "./ui/BookReadDetailPage";
 
+const getInitialDarkMode = () => {
+  const savedTheme = localStorage.getItem("theme");
+
+  if (savedTheme) {
+    return savedTheme === "dark";
+  }
+
+  return window.matchMedia("(prefers-color-scheme: dark)").matches;
+};
+
+const applyTheme = (isDark) => {
+  const htmlElement = document.documentElement;
+
+  if (isDark) {
+    htmlElement.setAttribute("data-theme", "dark");
+    htmlElement.style.colorScheme = "dark";
+    localStorage.setItem("theme", "dark");
+  } else {
+    htmlElement.removeAttribute("data-theme");
+    htmlElement.style.colorScheme = "light";
+    localStorage.setItem("theme", "light");
+  }
+};
+
+/** URL의 bookId를 상세 페이지에 전달하는 라우트 컴포넌트 */
+function BookReadDetailRoute(props) {
+  const { bookId } = useParams();
+
+  return <BookReadDetailPage {...props} bookId={bookId} />;
+}
+
+function BookEditRoute(props) {
+  const { bookId } = useParams();
+
+  return <BookDetailPage {...props} mode="edit" bookId={bookId} />;
+}
+
 function App() {
-  // 현재 보여줄 화면
-  const [currentView, setCurrentView] = useState("home");
-  // detail 화면일 때만 사용 — create(등록) | view(조회) | edit(수정, 추후)
-  const [detailMode, setDetailMode] = useState("create");
-  // 목록에서 선택한 도서 id (상세 조회·수정 시)
-  const [selectedBookId, setSelectedBookId] = useState(null);
   // 다크 모드 상태
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(getInitialDarkMode);
+  const navigate = useNavigate();
 
-  // --- 다크 모드 초기화 및 저장 ---
   useEffect(() => {
-    // localStorage에서 저장된 테마 설정 불러오기
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) {
-      const isDark = savedTheme === "dark";
-      setIsDarkMode(isDark);
-      applyTheme(isDark);
-    } else {
-      // 시스템 설정 확인
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      setIsDarkMode(prefersDark);
-      applyTheme(prefersDark);
-    }
-  }, []);
+    applyTheme(isDarkMode);
+  }, [isDarkMode]);
 
-  const applyTheme = (isDark) => {
-    const htmlElement = document.documentElement;
-    if (isDark) {
-      htmlElement.setAttribute("data-theme", "dark");
-      htmlElement.style.colorScheme = "dark";
-      localStorage.setItem("theme", "dark");
-    } else {
-      htmlElement.removeAttribute("data-theme");
-      htmlElement.style.colorScheme = "light";
-      localStorage.setItem("theme", "light");
-    }
-  };
-
+  // 현재 테마를 반대로 전환한다.
   const toggleTheme = () => {
-    setIsDarkMode((prev) => {
-      const newIsDarkMode = !prev;
-      applyTheme(newIsDarkMode);
-      return newIsDarkMode;
-    });
+    setIsDarkMode((prev) => !prev);
   };
 
-  // --- 라우트 ---
-  const goList = () => {
-    setCurrentView("list");
+  // 페이지 이동: 각 이동은 브라우저 방문 기록에 저장된다.
+  const goList = () => navigate("/books");
+  const goRegister = () => navigate("/books/new");
+  const goDetail = (bookId) => navigate(`/books/${bookId}`);
+  const goEdit = (bookId) => navigate(`/books/${bookId}/edit`);
+
+  // 모든 페이지에서 공통으로 사용하는 props
+  const commonPageProps = {
+    onGoList: goList,
+    onGoRegister: goRegister,
+    isDarkMode,
+    onToggleTheme: toggleTheme,
   };
-
-  /** 등록: detail + create, bookId 없음 */
-  const goRegister = () => {
-    setDetailMode("create");
-    setSelectedBookId(null);
-    setCurrentView("detail");
-  };
-
-  /** 목록 카드 클릭: detail + view, bookId 지정 */
-  const goDetail = (bookId) => {
-    setSelectedBookId(bookId);
-    setCurrentView("readDetail");
-  };
-
-  const goEdit = (bookId) => {
-    setDetailMode("edit");
-    setSelectedBookId(bookId);
-    setCurrentView("detail");
-  };
-
-  // --- 조건부 렌더: 한 번에 하나의 Page만 표시 ---
-
-  if (currentView === "home") {
-    return <HomePage onGoList={goList} onGoRegister={goRegister} isDarkMode={isDarkMode} onToggleTheme={toggleTheme} />;
-  }
-
-  if (currentView === "list") {
-    return (
-      <BookListPage
-        onGoList={goList}
-        onGoRegister={goRegister}
-        onGoDetail={goDetail}
-        isDarkMode={isDarkMode}
-        onToggleTheme={toggleTheme}
-      />
-    );
-  }
-
-  if (currentView === "readDetail") {
-    return (
-      <BookReadDetailPage
-        key={`read-${selectedBookId ?? "none"}`}
-        bookId={selectedBookId}
-        onGoList={goList}
-        onGoRegister={goRegister}
-        onGoEdit={goEdit}
-        isDarkMode={isDarkMode}
-        onToggleTheme={toggleTheme}
-      />
-    );
-  }
 
   return (
-    <BookDetailPage
-      key={`${detailMode}-${selectedBookId ?? "new"}`}
-      mode={detailMode}
-      bookId={selectedBookId}
-      onGoList={goList}
-      onGoRegister={goRegister}
-      isDarkMode={isDarkMode}
-      onToggleTheme={toggleTheme}
-    />
+    <>
+    <Toaster 
+      position="top-right" 
+      reverseOrder={false} 
+      toastOptions={{
+        style: {
+          background: '#333',
+          color: '#fff',
+          borderRadius: '12px',
+          padding: '12px 20px',
+          fontSize: '15px',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+    },
+
+      success: {
+        duration: 3000,
+        style: {
+          background: '#E8F5E9',
+          color: '#2E7D32',
+          border: '1px solid #A5D6A7',
+        },
+      },
+
+      error: {
+        duration: 4000,
+        style: {
+          background: '#FFEBEE',
+          color: '#C62828',
+          border: '1px solid #FFCDD2',
+        },
+      },
+    }}
+  />
+    <Routes>
+      {/* 홈 */}
+      <Route path="/" element={<HomePage {...commonPageProps} />} />
+
+      {/* 도서 목록 */}
+      <Route
+        path="/books"
+        element={<BookListPage {...commonPageProps} onGoDetail={goDetail} />}
+      />
+
+      {/* 도서 등록 */}
+      <Route
+        path="/books/new"
+        element={<BookDetailPage {...commonPageProps} mode="create" />}
+      />
+
+      {/* 도서 상세 조회 및 수정 */}
+      <Route
+        path="/books/:bookId/edit"
+        element={<BookEditRoute {...commonPageProps} />}
+      />
+
+      <Route
+        path="/books/:bookId"
+        element={<BookReadDetailRoute {...commonPageProps} onGoEdit={goEdit} />}
+      />
+
+      {/* 정의되지 않은 주소는 홈으로 이동 */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+    </>
   );
 }
 
