@@ -31,7 +31,6 @@ function BookDetailPage({ mode, bookId, onGoList, onGoRegister, isDarkMode, onTo
     const fetchBookDetail = async () => {
       try {
         setPageLoading(true);
-        setErrorMessage("");
 
         const data = await BookDetail(bookId);
 
