@@ -1,25 +1,54 @@
+import { useEffect, useMemo, useState } from "react";
+import { BookList } from "../api/bookApi";
 import Header from "../components/Header";
-import MainButton from "../components/comButton/MainButton";
+import HomeCarousel from "./home/HomeCarousel";
+import { getTopViewedBooks } from "./home/homeUtils";
 import "./HomePage.css";
 
-// 홈 페이지 — 서비스 소개 및 목록·등록 진입
-function HomePage({ onGoList, onGoRegister, isDarkMode, onToggleTheme }) {
+function HomePage({
+  onGoList,
+  onGoRegister,
+  onGoDetail,
+  isDarkMode,
+  onToggleTheme,
+}) {
+  const [books, setBooks] = useState([]);
+  const [isLoadingBooks, setIsLoadingBooks] = useState(false);
+
+  useEffect(() => {
+    let ignore = false;
+
+    const fetchBooks = async () => {
+      setIsLoadingBooks(true);
+      const data = await BookList();
+
+      if (!ignore) {
+        setBooks(Array.isArray(data) ? data : []);
+        setIsLoadingBooks(false);
+      }
+    };
+
+    fetchBooks();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  const recommendedBooks = useMemo(() => getTopViewedBooks(books), [books]);
+
   return (
     <div className="homePage">
       <Header isMain isDarkMode={isDarkMode} onToggleTheme={onToggleTheme} />
 
       <main className="homePage-main">
-        <h1 className="homePage-title">
-          도서 관리 시스템에 오신 것을 환영합니다
-        </h1>
-        <p className="homePage-desc">
-          이 시스템을 사용하여 도서를 등록하고 관리할 수 있습니다
-        </p>
-
-        <div className="homePage-actions">
-          <MainButton onClick={onGoList}>도서 목록 보기</MainButton>
-          <MainButton onClick={onGoRegister}>도서 등록 하기</MainButton>
-        </div>
+        <HomeCarousel
+          recommendedBooks={recommendedBooks}
+          isLoadingBooks={isLoadingBooks}
+          onGoList={onGoList}
+          onGoRegister={onGoRegister}
+          onGoDetail={onGoDetail}
+        />
       </main>
     </div>
   );
