@@ -121,24 +121,84 @@ function BookDetailPage({ mode, bookId, onGoList, onGoRegister, isDarkMode, onTo
   const handleDelete = async () => {
     if (isCreate || !bookId) return;
 
-    const confirmed = window.confirm("정말 이 도서를 삭제하시겠습니까?");
-    if (!confirmed) return;
-
-    try{
-      const success = await BookDelete(bookId);
-
-      if (!success) {
-        toast.error("도서 삭제에 실패했습니다.");
-        return;
+    toast((t) => (
+      <div 
+        className="custom-confirm-toast"
+        style={{
+          backgroundColor: isDarkMode ? "#1F2937" : "#ffffff",
+          color: isDarkMode ? "#F3F4F6" : "#1F2937",
+          padding: "8px",
+          borderRadius: "8px"
+        }}
+      >
+        <p style={{ margin: "0 0 8px 0", fontWeight: "bold", fontSize: "15px" }}>
+          이 도서를 정말 삭제할까요?
+        </p>
+        <p style={{ fontSize: "12px", color: "#888", margin: "0 0 14px 0" }}>
+          삭제된 데이터는 복구할 수 없습니다.
+        </p>
+        <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            style={{
+              padding: "6px 12px",
+              backgroundColor: isDarkMode ? "#374151" : "#F3F4F6",
+              color: isDarkMode ? "#F3F4F6" : "#1F2937",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontSize: "13px"
+            }}
+          >
+            취소
+          </button>
+          <button
+            onClick={async () => {
+              toast.dismiss(t.id);
+              await executeDelete();
+            }}
+            style={{
+              padding: "6px 12px",
+              backgroundColor: "#E53E3E",
+              color: "white",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontSize: "13px",
+              fontWeight: "bold"
+            }}
+          >
+            삭제하기
+          </button>
+        </div>
+      </div>
+    ), {
+      duration: Infinity,
+      position: "top-center",
+      style: {
+        background: "transparent",
+        boxShadow: "none",
+        padding: 0
       }
-
-      toast.success("도서가 삭제되었습니다.");
-      onGoList();
-    } catch (error) {
-      console.error(error);
-      toast.error("삭제 중 서버 오류가 발생했습니다.")
-    }
+    });
   };
+
+    const executeDelete = async () => {
+      try{
+        const success = await BookDelete(bookId);
+
+        if (!success) {
+          toast.error("도서 삭제에 실패했습니다.");
+          return;
+        }
+
+        toast.success("도서가 삭제되었습니다.");
+        onGoList();
+      } catch (error) {
+        console.error(error);
+        toast.error("삭제 중 서버 오류가 발생했습니다.")
+      }
+    };
 
   return (
     <div className="bookDetailPage">
