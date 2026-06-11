@@ -27,11 +27,66 @@
 
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
+}
+
+.book-form-title-field {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.book-form-title-header {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.book-form-title-label {
+  flex-shrink: 0;
+
+  color: var(--text-main);
+  font-size: var(--font-small);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.book-form-title-input {
+  width: 100%;
+  height: 46px;
+  box-sizing: border-box;
+
+  padding: 0 16px;
+
+  border: 1px solid var(--text-placeholder);
+  border-radius: 10px;
+  background: var(--bg-main, #ffffff);
+
+  color: var(--text-main);
+  font-size: var(--font-small);
+  font-weight: 600;
+
+  outline: none;
+}
+
+.book-form-title-input::placeholder {
+  color: var(--text-placeholder);
+  font-size: var(--font-small);
+  font-weight: 700;
+}
+
+.book-form-title-input:focus {
+  border-color: var(--primary, #65702a);
 }
 
 .book-form-actions {
-  margin-top: 20px;
+  margin-top: auto;
+  padding-top: 20px;
 
   display: flex;
   justify-content: flex-end;
