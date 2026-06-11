@@ -4,6 +4,33 @@ import BookListPage from "./ui/BookListPage";
 import BookDetailPage from "./ui/BookDetailPage";
 import BookReadDetailPage from "./ui/BookReadDetailPage";
 
+const getInitialDarkMode = () => {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  const savedTheme = window.localStorage.getItem("theme");
+
+  if (savedTheme) {
+    return savedTheme === "dark";
+  }
+
+  return window.matchMedia("(prefers-color-scheme: dark)").matches;
+};
+
+const applyTheme = (isDark) => {
+  const htmlElement = document.documentElement;
+  if (isDark) {
+    htmlElement.setAttribute("data-theme", "dark");
+    htmlElement.style.colorScheme = "dark";
+    localStorage.setItem("theme", "dark");
+  } else {
+    htmlElement.removeAttribute("data-theme");
+    htmlElement.style.colorScheme = "light";
+    localStorage.setItem("theme", "light");
+  }
+};
+
 function App() {
   // 현재 보여줄 화면
   const [currentView, setCurrentView] = useState("home");
@@ -12,43 +39,15 @@ function App() {
   // 목록에서 선택한 도서 id (상세 조회·수정 시)
   const [selectedBookId, setSelectedBookId] = useState(null);
   // 다크 모드 상태
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(getInitialDarkMode);
 
   // --- 다크 모드 초기화 및 저장 ---
   useEffect(() => {
-    // localStorage에서 저장된 테마 설정 불러오기
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) {
-      const isDark = savedTheme === "dark";
-      setIsDarkMode(isDark);
-      applyTheme(isDark);
-    } else {
-      // 시스템 설정 확인
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      setIsDarkMode(prefersDark);
-      applyTheme(prefersDark);
-    }
-  }, []);
-
-  const applyTheme = (isDark) => {
-    const htmlElement = document.documentElement;
-    if (isDark) {
-      htmlElement.setAttribute("data-theme", "dark");
-      htmlElement.style.colorScheme = "dark";
-      localStorage.setItem("theme", "dark");
-    } else {
-      htmlElement.removeAttribute("data-theme");
-      htmlElement.style.colorScheme = "light";
-      localStorage.setItem("theme", "light");
-    }
-  };
+    applyTheme(isDarkMode);
+  }, [isDarkMode]);
 
   const toggleTheme = () => {
-    setIsDarkMode((prev) => {
-      const newIsDarkMode = !prev;
-      applyTheme(newIsDarkMode);
-      return newIsDarkMode;
-    });
+    setIsDarkMode((prev) => !prev);
   };
 
   // --- 라우트 ---
@@ -78,7 +77,15 @@ function App() {
   // --- 조건부 렌더: 한 번에 하나의 Page만 표시 ---
 
   if (currentView === "home") {
-    return <HomePage onGoList={goList} onGoRegister={goRegister} isDarkMode={isDarkMode} onToggleTheme={toggleTheme} />;
+    return (
+      <HomePage
+        onGoList={goList}
+        onGoRegister={goRegister}
+        onGoDetail={goDetail}
+        isDarkMode={isDarkMode}
+        onToggleTheme={toggleTheme}
+      />
+    );
   }
 
   if (currentView === "list") {
