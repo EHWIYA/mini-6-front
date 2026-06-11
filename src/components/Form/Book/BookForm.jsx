@@ -1,7 +1,7 @@
 import Input from "../../common/Input";
 import MainButton from "../../comButton/MainButton";
+import GenreSelector from "./GenreSelector";
 import "./BookFormStyle.css";
-import { toast } from "react-hot-toast";
 
 function BookForm({
   isCreate,
@@ -20,6 +20,13 @@ function BookForm({
     }));
   };
 
+  const handleGenreSelect = (genre) => {
+    setBookData((prev) => ({
+      ...prev,
+      genre,
+    }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     onSave();
@@ -34,13 +41,27 @@ function BookForm({
       {!isCreate && <p className="book-form-id">기존 도서 ID: {bookId}</p>}
 
       <form className="book-form-body" onSubmit={handleSubmit}>
-        <Input
-          label="책 제목:"
-          name="title"
-          value={bookData.title}
-          onChange={handleChange}
-          placeholder="여러분의 책 제목을 입력해주세요."
-        />
+        <div className="book-form-title-field">
+          <div className="book-form-title-header">
+            <label className="book-form-title-label" htmlFor="book-title">
+              책 제목:
+            </label>
+
+            <GenreSelector
+              selectedGenre={bookData.genre}
+              onSelectGenre={handleGenreSelect}
+            />
+          </div>
+
+          <input
+            id="book-title"
+            className="book-form-title-input"
+            name="title"
+            value={bookData.title}
+            onChange={handleChange}
+            placeholder="여러분의 책 제목을 입력해주세요."
+          />
+        </div>
 
         <Input
           label="저자:"
