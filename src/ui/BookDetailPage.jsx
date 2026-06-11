@@ -5,6 +5,7 @@ import {
   BookUpdate,
   BookDelete,
 } from "../api/bookApi";
+import { createGenre, isGenreAlreadyExistsError } from "../api/genreApi";
 import { toast } from "react-hot-toast";
 
 import Header from "../components/Header";
@@ -16,10 +17,16 @@ const INITIAL_BOOK_DATA = {
   title: "",
   author: "",
   genre: "",
+  genreId: null,
+  isNewGenre: false,
   content: "",
   coverImageUrl: "",
   views: 0,
 };
+
+const GENRE_CREATE_SETTLE_DELAY_MS = 300;
+
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function BookDetailPage({
   mode,
@@ -33,6 +40,7 @@ function BookDetailPage({
 
   const [bookData, setBookData] = useState(INITIAL_BOOK_DATA);
   const [pageLoading, setPageLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   const toastPosition = isMobile ? "bottom-center" : "top-right";
@@ -51,8 +59,17 @@ function BookDetailPage({
 
   useEffect(() => {
     if (isCreate || !bookId) {
-      setBookData(INITIAL_BOOK_DATA);
-      return;
+      let ignore = false;
+
+      queueMicrotask(() => {
+        if (!ignore) {
+          setBookData(INITIAL_BOOK_DATA);
+        }
+      });
+
+      return () => {
+        ignore = true;
+      };
     }
 
     let ignore = false;
@@ -73,10 +90,21 @@ function BookDetailPage({
           return;
         }
 
+        const genreValue =
+          typeof data.genre === "object" && data.genre !== null
+            ? data.genre.name
+            : data.genre;
+        const genreId =
+          typeof data.genre === "object" && data.genre !== null
+            ? data.genre.id
+            : data.genreId;
+
         setBookData({
           title: data.title || "",
           author: data.author || "",
-          genre: data.genre || "",
+          genre: genreValue || "",
+          genreId: genreId ?? null,
+          isNewGenre: false,
           content: data.content || "",
           coverImageUrl: data.coverImageUrl || "",
           views: data.views || 0,
@@ -104,6 +132,8 @@ function BookDetailPage({
   }, [isCreate, bookId, toastPosition]);
 
   const handleSave = async () => {
+    if (isSaving) return;
+
     if (
       !bookData.title.trim() ||
       !bookData.author.trim() ||
@@ -115,15 +145,75 @@ function BookDetailPage({
       return;
     }
 
-    const bookPayload = {
-      title: bookData.title.trim(),
-      author: bookData.author.trim(),
-      genre: bookData.genre?.trim() || "",
-      content: bookData.content.trim(),
-      coverImageUrl: bookData.coverImageUrl || "",
-    };
+    const selectedGenreName = bookData.genre?.trim() || "";
+
+    if (!selectedGenreName) {
+      toast.error("장르를 선택해주세요.", {
+        position: toastPosition,
+      });
+      return;
+    }
+
+    setIsSaving(true);
 
     try {
+      let createdGenre = null;
+      let selectedGenreId = bookData.genreId ?? null;
+      let genreName = selectedGenreName;
+
+      if (bookData.isNewGenre) {
+        try {
+          createdGenre = await createGenre(selectedGenreName);
+          selectedGenreId = createdGenre?.id ?? null;
+          genreName = createdGenre?.name || selectedGenreName;
+
+          if (!selectedGenreId) {
+            toast.error("새 장르 정보를 확인할 수 없습니다.", {
+              position: toastPosition,
+            });
+            return;
+          }
+
+          setBookData((prev) => ({
+            ...prev,
+            genre: genreName,
+            genreId: selectedGenreId,
+            isNewGenre: false,
+          }));
+
+          await wait(GENRE_CREATE_SETTLE_DELAY_MS);
+        } catch (error) {
+          console.error(error);
+
+          if (isGenreAlreadyExistsError(error)) {
+            toast.error("이미 존재하는 장르입니다. 장르 목록에서 다시 선택해주세요.", {
+              position: toastPosition,
+            });
+            return;
+          }
+
+          toast.error("새 장르 추가에 실패했습니다.", {
+            position: toastPosition,
+          });
+          return;
+        }
+      }
+
+      if (selectedGenreId === null || selectedGenreId === undefined || selectedGenreId === "") {
+        toast.error("장르 목록에서 장르를 다시 선택해주세요.", {
+          position: toastPosition,
+        });
+        return;
+      }
+
+      const bookPayload = {
+        title: bookData.title.trim(),
+        author: bookData.author.trim(),
+        genreId: Number(selectedGenreId),
+        content: bookData.content.trim(),
+        coverImageUrl: bookData.coverImageUrl || "",
+      };
+
       if (isCreate) {
         const createdBook = await BookCreate({
           ...bookPayload,
@@ -137,9 +227,14 @@ function BookDetailPage({
           return;
         }
 
-        toast.success("도서가 성공적으로 등록되었습니다.", {
-          position: toastPosition,
-        });
+        toast.success(
+          createdGenre
+            ? "새 장르와 도서가 성공적으로 등록되었습니다."
+            : "도서가 성공적으로 등록되었습니다.",
+          {
+            position: toastPosition,
+          }
+        );
         onGoList();
         return;
       }
@@ -156,15 +251,22 @@ function BookDetailPage({
         return;
       }
 
-      toast.success("도서 정보가 수정되었습니다.", {
-        position: toastPosition,
-      });
+      toast.success(
+        createdGenre
+          ? "새 장르가 추가되고 도서 정보가 수정되었습니다."
+          : "도서 정보가 수정되었습니다.",
+        {
+          position: toastPosition,
+        }
+      );
       onGoList();
     } catch (error) {
       console.error(error);
       toast.error("서버 통신 중 오류가 발생했습니다.", {
         position: toastPosition,
       });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -312,6 +414,7 @@ function BookDetailPage({
                 setBookData={setBookData}
                 onSave={handleSave}
                 onDelete={handleDelete}
+                isSaving={isSaving}
               />
             </section>
 

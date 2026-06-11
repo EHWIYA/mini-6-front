@@ -10,6 +10,7 @@ function BookForm({
   setBookData,
   onSave,
   onDelete,
+  isSaving = false,
 }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,9 +22,15 @@ function BookForm({
   };
 
   const handleGenreSelect = (genre) => {
+    const genreName = typeof genre === "string" ? genre : genre?.name || "";
+    const genreId = typeof genre === "string" ? null : genre?.id ?? null;
+    const isNewGenre = typeof genre === "string" ? false : Boolean(genre?.isNew);
+
     setBookData((prev) => ({
       ...prev,
-      genre,
+      genre: genreName,
+      genreId,
+      isNewGenre,
     }));
   };
 
@@ -55,7 +62,15 @@ function BookForm({
               placeholder="여러분의 책 제목을 입력해주세요."
             />
             <GenreSelector
-              selectedGenre={bookData.genre}
+              selectedGenre={
+                bookData.genre
+                  ? {
+                      id: bookData.genreId ?? null,
+                      name: bookData.genre,
+                      isNew: Boolean(bookData.isNewGenre),
+                    }
+                  : null
+              }
               onSelectGenre={handleGenreSelect}
             />
           </div>
@@ -84,13 +99,14 @@ function BookForm({
               type="button"
               onClick={onDelete}
               variant="delete-button"
+              disabled={isSaving}
             >
               도서 삭제
             </MainButton>
           )}
 
-          <MainButton type="submit">
-            {isCreate ? "도서 등록" : "도서 수정"}
+          <MainButton type="submit" disabled={isSaving}>
+            {isSaving ? "저장 중" : isCreate ? "도서 등록" : "도서 수정"}
           </MainButton>
         </div>
       </form>
