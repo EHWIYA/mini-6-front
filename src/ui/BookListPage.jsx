@@ -1,6 +1,6 @@
 // 도서 목록 페이지
 import { useEffect, useState } from "react";
-import { BookList, BookSearch } from "../api/bookApi";
+import { BookLikeCount, BookList, BookSearch } from "../api/bookApi";
 
 import Header from "../components/Header";
 import BookCard from "../components/bookCard/BookCard";
@@ -39,6 +39,20 @@ function BookListPage({ onGoList, onGoRegister, onGoDetail, isDarkMode, onToggle
     if (e.key === "Enter") {
       handleSearch();
     }
+  };
+
+  const handleLike = async (bookId) => {
+    const likedBook = await BookLikeCount(bookId);
+
+    if (!likedBook) return;
+
+    setBooks((prevBooks) =>
+      prevBooks.map((book) =>
+        book.id === bookId
+          ? { ...book, likes: likedBook.likes ?? (book.likes || 0) + 1 }
+          : book
+      )
+    );
   };
 
   const sortedBooks = [...books].sort((a, b) => {
@@ -97,7 +111,12 @@ function BookListPage({ onGoList, onGoRegister, onGoDetail, isDarkMode, onToggle
         ) : (
           <section className="bookListPage-grid">
             {sortedBooks.map((book) => (
-              <BookCard key={book.id} book={book} onClick={onGoDetail} />
+              <BookCard
+                key={book.id}
+                book={book}
+                onClick={onGoDetail}
+                onLike={handleLike}
+              />
             ))}
           </section>
         )}

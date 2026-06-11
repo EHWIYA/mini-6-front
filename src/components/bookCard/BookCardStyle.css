@@ -55,11 +55,34 @@
   overflow: hidden;
 }
 
-.bookCard-views {
+.bookCard-stats {
   margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.bookCard-views {
+  margin: 0;
   text-align: left;
   font-size: 12px;
   color: #6f7350;
+}
+
+.bookCard-likeButton {
+  border: 1px solid var(--border-main);
+  border-radius: 6px;
+  background-color: transparent;
+  color: var(--text-main);
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bookCard-likeButton:hover {
+  background-color: var(--bg-main);
 }
 
 /* 모바일 (768px 미만) */
@@ -80,7 +103,14 @@
     font-size: 9px;
   }
 
-  .bookCard-views {
+  .bookCard-stats {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .bookCard-views,
+  .bookCard-likeButton {
     font-size: 9px;
   }
 }

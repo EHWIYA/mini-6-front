@@ -11,7 +11,8 @@ const INITIAL_BOOK_DATA = {
   author: "",
   content: "",
   coverImageUrl: "",
-  views: 0
+  views: 0,
+  likes: 0
 };
 
 function BookDetailPage({ mode, bookId, onGoList, onGoRegister, isDarkMode, onToggleTheme }) {
@@ -48,6 +49,7 @@ function BookDetailPage({ mode, bookId, onGoList, onGoRegister, isDarkMode, onTo
           content: data.content || "",
           coverImageUrl: data.coverImageUrl || "",
           views: data.views || 0,
+          likes: data.likes || 0,
         });
         await BookViewCount(bookId);
       } catch (error) {
@@ -85,7 +87,8 @@ function BookDetailPage({ mode, bookId, onGoList, onGoRegister, isDarkMode, onTo
         author: bookData.author,
         content: bookData.content,
         coverImageUrl: bookData.coverImageUrl,
-        views: 0
+        views: 0,
+        likes: 0
       });
 
       if (!createdBook) {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BookDetail, BookViewCount } from "../api/bookApi";
+import { BookDetail, BookLikeCount, BookViewCount } from "../api/bookApi";
 
 import Header from "../components/Header";
 import ReviewSection from "../components/Review/ReviewSection"; // 리뷰·관리자 댓글 영역
@@ -64,6 +64,20 @@ function BookReadDetailPage({
     };
   }, [bookId]);
 
+  const handleLike = async () => {
+    if (!bookId) return;
+
+    const likedBook = await BookLikeCount(bookId);
+
+    if (!likedBook) return;
+
+    setBook((prevBook) =>
+      prevBook
+        ? { ...prevBook, likes: likedBook.likes ?? (prevBook.likes || 0) + 1 }
+        : prevBook
+    );
+  };
+
   return (
     <div className="bookReadDetailPage">
       <Header
@@ -123,6 +137,13 @@ function BookReadDetailPage({
                 </div>
 
                 <div className="bookReadDetailPage-actions">
+                  <button
+                    type="button"
+                    className="bookReadDetailPage-button bookReadDetailPage-button--like"
+                    onClick={handleLike}
+                  >
+                    좋아요 {book.likes || 0}
+                  </button>
                   <button
                     type="button"
                     className="bookReadDetailPage-button bookReadDetailPage-button--secondary"

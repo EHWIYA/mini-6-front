@@ -134,6 +134,14 @@
   background-color: #49501e;
 }
 
+.bookReadDetailPage-button--like {
+  background-color: rgb(35, 165, 216);
+}
+
+.bookReadDetailPage-button--like:hover {
+  background-color: #963847;
+}
+
 .bookReadDetailPage-button--secondary {
   background-color: transparent;
   border: 1px solid var(--border-main);
