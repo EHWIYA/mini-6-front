@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
+import Fuse from "fuse.js";
+import Filter from "badwords-ko";
 import "./GenreModal.css";
 
 const GENRES = [
@@ -32,12 +34,16 @@ const normalizeGenre = (value) => {
   return value.trim().replace(/\s+/g, " ");
 };
 
-const isDuplicateGenre = (newGenre, genres) => {
-  const normalizedNewGenre = normalizeGenre(newGenre).toLowerCase();
+const normalizeForCompare = (value) => {
+  return normalizeGenre(value)
+    .toLowerCase()
+    .replace(/[\/&\s]/g, "");
+};
 
-  return genres.some(
-    (genre) => normalizeGenre(genre).toLowerCase() === normalizedNewGenre
-  );
+const isDuplicateGenre = (newGenre, genres) => {
+  const normalizedNewGenre = normalizeForCompare(newGenre);
+
+  return genres.some((genre) => normalizeForCompare(genre) === normalizedNewGenre);
 };
 
 const isValidGenreText = (genre) => {
@@ -47,6 +53,44 @@ const isValidGenreText = (genre) => {
 function GenreModal({ selectedGenre, onSelectGenre, onClose }) {
   const [isCustomOpen, setIsCustomOpen] = useState(false);
   const [customGenre, setCustomGenre] = useState("");
+  const [suggestedGenre, setSuggestedGenre] = useState("");
+
+  const profanityFilter = useMemo(() => new Filter(), []);
+
+  const fuse = useMemo(
+    () =>
+      new Fuse(GENRES, {
+        threshold: 0.35,
+        includeScore: true,
+      }),
+    []
+  );
+
+  const getSimilarGenre = (genre) => {
+    const result = fuse.search(genre);
+
+    if (!result.length) {
+      return "";
+    }
+
+    const bestMatch = result[0];
+
+    if (bestMatch.score <= 0.35) {
+      return bestMatch.item;
+    }
+
+    return "";
+  };
+
+  const resetCustomForm = () => {
+    setCustomGenre("");
+    setSuggestedGenre("");
+    setIsCustomOpen(false);
+  };
+
+  const handleGenreSelect = (genre) => {
+    onSelectGenre(genre);
+  };
 
   const handleCustomGenreAdd = () => {
     const trimmedGenre = normalizeGenre(customGenre);
@@ -66,14 +110,39 @@ function GenreModal({ selectedGenre, onSelectGenre, onClose }) {
       return;
     }
 
+    if (profanityFilter.isProfane(trimmedGenre)) {
+      toast.error("부적절한 표현은 장르로 사용할 수 없습니다.");
+      return;
+    }
+
     if (isDuplicateGenre(trimmedGenre, GENRES)) {
       toast.error("이미 존재하는 장르입니다.");
       return;
     }
 
+    const similarGenre = getSimilarGenre(trimmedGenre);
+
+    if (similarGenre && normalizeForCompare(similarGenre) !== normalizeForCompare(trimmedGenre)) {
+      setSuggestedGenre(similarGenre);
+      return;
+    }
+
     onSelectGenre(trimmedGenre);
-    setCustomGenre("");
-    setIsCustomOpen(false);
+    resetCustomForm();
+  };
+
+  const handleUseSuggestedGenre = () => {
+    if (!suggestedGenre) return;
+
+    onSelectGenre(suggestedGenre);
+    resetCustomForm();
+  };
+
+  const handleUseCustomGenreAnyway = () => {
+    const trimmedGenre = normalizeGenre(customGenre);
+
+    onSelectGenre(trimmedGenre);
+    resetCustomForm();
   };
 
   const handleCustomGenreKeyDown = (e) => {
@@ -116,7 +185,7 @@ function GenreModal({ selectedGenre, onSelectGenre, onClose }) {
                 className={`genre-modal-item ${
                   selectedGenre === genre ? "selected" : ""
                 }`}
-                onClick={() => onSelectGenre(genre)}
+                onClick={() => handleGenreSelect(genre)}
               >
                 {genre}
               </button>
@@ -135,24 +204,47 @@ function GenreModal({ selectedGenre, onSelectGenre, onClose }) {
             )}
 
             {isCustomOpen && (
-              <div className="genre-modal-custom-form">
-                <input
-                  className="genre-modal-custom-input"
-                  value={customGenre}
-                  onChange={(e) => setCustomGenre(e.target.value)}
-                  onKeyDown={handleCustomGenreKeyDown}
-                  placeholder="새 장르를 입력해주세요."
-                  autoFocus
-                />
+              <>
+                <div className="genre-modal-custom-form">
+                  <input
+                    className="genre-modal-custom-input"
+                    value={customGenre}
+                    onChange={(e) => {
+                      setCustomGenre(e.target.value);
+                      setSuggestedGenre("");
+                    }}
+                    onKeyDown={handleCustomGenreKeyDown}
+                    placeholder="새 장르를 입력해주세요."
+                    autoFocus
+                  />
 
-                <button
-                  type="button"
-                  className="genre-modal-custom-add-button"
-                  onClick={handleCustomGenreAdd}
-                >
-                  추가
-                </button>
-              </div>
+                  <button
+                    type="button"
+                    className="genre-modal-custom-add-button"
+                    onClick={handleCustomGenreAdd}
+                  >
+                    추가
+                  </button>
+                </div>
+
+                {suggestedGenre && (
+                  <div className="genre-modal-suggestion">
+                    <p>
+                      혹시 <strong>{suggestedGenre}</strong> 장르를 의미하셨나요?
+                    </p>
+
+                    <div className="genre-modal-suggestion-actions">
+                      <button type="button" onClick={handleUseSuggestedGenre}>
+                        {suggestedGenre} 선택
+                      </button>
+
+                      <button type="button" onClick={handleUseCustomGenreAnyway}>
+                        그대로 추가
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
