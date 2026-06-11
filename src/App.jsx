@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useNavigate, useParams } from "react-router";
 import HomePage from "./ui/HomePage";
 import BookListPage from "./ui/BookListPage";
 import BookDetailPage from "./ui/BookDetailPage";
+import BookReadDetailPage from "./ui/BookReadDetailPage";
 
 /** URL의 bookId를 상세 페이지에 전달하는 라우트 컴포넌트 */
 function BookDetailRoute(props) {

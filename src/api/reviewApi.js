@@ -1,0 +1,111 @@
+const BASE_URL = "http://localhost:8080";
+
+const JSON_HEADERS = {
+  "Content-Type": "application/json",
+};
+
+const parseErrorMessage = async (res, fallback) => {
+  try {
+    const text = await res.text();
+    if (!text) {
+      return fallback;
+    }
+
+    try {
+      const data = JSON.parse(text);
+      return data.message || text;
+    } catch {
+      return text;
+    }
+  } catch {
+    return fallback;
+  }
+};
+
+/** GET /books/{bookId}/reviews */
+export const getReviewsByBookId = async (bookId) => {
+  try {
+    const res = await fetch(`${BASE_URL}/books/${bookId}/reviews`);
+
+    if (!res.ok) {
+      throw new Error("리뷰 목록 조회 실패");
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
+
+/** GET /books/{bookId}/reviews/rating */
+export const getBookRating = async (bookId) => {
+  try {
+    const res = await fetch(`${BASE_URL}/books/${bookId}/reviews/rating`);
+
+    if (!res.ok) {
+      throw new Error("평균 별점 조회 실패");
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error(error);
+    return 0;
+  }
+};
+
+/** POST /books/{bookId}/reviews */
+export const createReview = async (bookId, { content, rating }) => {
+  const res = await fetch(`${BASE_URL}/books/${bookId}/reviews`, {
+    method: "POST",
+    headers: JSON_HEADERS,
+    body: JSON.stringify({ content, rating }),
+  });
+
+  if (!res.ok) {
+    throw new Error(await parseErrorMessage(res, "리뷰 작성에 실패했습니다."));
+  }
+
+  return await res.json();
+};
+
+/** PATCH /reviews/{reviewId} */
+export const updateReview = async (reviewId, { content, rating }) => {
+  const res = await fetch(`${BASE_URL}/reviews/${reviewId}`, {
+    method: "PATCH",
+    headers: JSON_HEADERS,
+    body: JSON.stringify({ content, rating }),
+  });
+
+  if (!res.ok) {
+    throw new Error(await parseErrorMessage(res, "리뷰 수정에 실패했습니다."));
+  }
+
+  return await res.json();
+};
+
+/** DELETE /reviews/{reviewId} */
+export const deleteReview = async (reviewId) => {
+  const res = await fetch(`${BASE_URL}/reviews/${reviewId}`, {
+    method: "DELETE",
+  });
+
+  if (!res.ok) {
+    throw new Error(await parseErrorMessage(res, "리뷰 삭제에 실패했습니다."));
+  }
+
+  return true;
+};
+
+/** PATCH /reviews/{reviewId}/like */
+export const likeReview = async (reviewId) => {
+  const res = await fetch(`${BASE_URL}/reviews/${reviewId}/like`, {
+    method: "PATCH",
+  });
+
+  if (!res.ok) {
+    throw new Error(await parseErrorMessage(res, "좋아요 처리에 실패했습니다."));
+  }
+
+  return await res.json();
+};
