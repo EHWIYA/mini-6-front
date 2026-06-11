@@ -20,6 +20,7 @@ function ReviewSection({ bookId }) {
   const [averageRating, setAverageRating] = useState(0);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const loadReviews = useCallback(async () => {
     if (!bookId) {
@@ -54,6 +55,7 @@ function ReviewSection({ bookId }) {
   const handleCreateReview = async (formData) => {
     await createReview(bookId, formData);
     await loadReviews();
+    setIsModalOpen(false);
   };
 
   const handleLikeReview = async (reviewId) => {
@@ -71,6 +73,8 @@ function ReviewSection({ bookId }) {
   return (
     <section className="reviewSection" aria-labelledby="review-section-title">
       <div className="reviewSection-header">
+
+        <div className="reviewSection-header-left">
         <h2 id="review-section-title" className="reviewSection-title">
           리뷰
         </h2>
@@ -80,10 +84,18 @@ function ReviewSection({ bookId }) {
             평균 {formatRating(averageRating)}
           </span>
         )}
+        </div>
+        <button 
+          type="button" 
+          className="reviewSection-writeBtn"
+          onClick={() => setIsModalOpen(true)}
+        >
+          리뷰 작성
+        </button>
       </div>
 
+        
       <div className="reviewSection-body">
-        <ReviewForm onSubmit={handleCreateReview} />
 
         {loading && (
           <p className="reviewSection-message">리뷰를 불러오는 중입니다.</p>
@@ -110,6 +122,29 @@ function ReviewSection({ bookId }) {
           )
         )}
       </div>
+        {isModalOpen && (
+        <div 
+          className="reviewForm-modalOverlay"
+          onClick={() => setIsModalOpen(false)}
+          style={{
+            position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
+            backgroundColor: "rgba(0, 0, 0, 0.45)", display: "flex",
+            justifyContent: "center", alignItems: "center", zIndex: 1000
+          }}
+        >
+          <div 
+            className="reviewForm-modalBox"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: "90%", maxWidth: "520px", backgroundColor: "#fff",
+              padding: "24px", borderRadius: "12px", boxShadow: "0 10px 30px rgba(0,0,0,0.15)"
+            }}
+          >
+            <ReviewForm onSubmit={handleCreateReview} onClose={() => setIsModalOpen(false)} />
+          </div>
+        </div>
+      )}
+
     </section>
   );
 }

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { toast } from "react-hot-toast";
 import Input from "../common/Input";
 import MainButton from "../comButton/MainButton";
 import "./ReviewForm.css";
@@ -13,10 +14,19 @@ const INITIAL_FORM = {
  *
  * @param {{ onSubmit: (formData: { rating: number, content: string }) => Promise<void> }} props
  */
-function ReviewForm({ onSubmit }) {
+function ReviewForm({ onSubmit, onClose }) {
   const [form, setForm] = useState(INITIAL_FORM);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,6 +55,9 @@ function ReviewForm({ onSubmit }) {
     const error = validate();
     if (error) {
       setErrorMessage(error);
+      toast.error(error, {
+        position: isMobile ? "bottom-center" : "top-right"
+      });
       return;
     }
 
@@ -58,9 +71,16 @@ function ReviewForm({ onSubmit }) {
       });
 
       setForm(INITIAL_FORM);
+      toast.success("리뷰가 성공적으로 등록되었습니다.", {
+        position: isMobile ? "bottom-center" : "top-right"
+      });
     } catch (error) {
       console.error(error);
-      setErrorMessage(error.message || "리뷰 등록에 실패했습니다.");
+      const serverError = error.message || "리뷰 등록에 실패했습니다.";
+      setErrorMessage(serverError);
+      toast.error(serverError, {
+        position: isMobile ? "bottom-center" : "top-right"
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -102,7 +122,23 @@ function ReviewForm({ onSubmit }) {
         <p className="validation-error reviewForm-message">{errorMessage}</p>
       )}
 
-      <div className="reviewForm-actions">
+      <div className="reviewForm-actions" style={{ display: "flex", gap: "8px", justifyContent: "flex-end", marginTop: "16px" }}>
+        <button
+          type="button"
+          onClick={onClose}
+          disabled={isSubmitting}
+          style={{
+            padding: "10px 18px",
+            backgroundColor: "#f3f4f6",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontSize: "14px",
+            color: "#4b5563"
+          }}
+        >
+          취소
+        </button>
         <MainButton type="submit" disabled={isSubmitting}>
           {isSubmitting ? "등록 중..." : "리뷰 등록"}
         </MainButton>

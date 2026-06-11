@@ -15,8 +15,14 @@
 .reviewSection-header {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
   margin-bottom: 24px;
+}
+
+.reviewSection-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .reviewSection-title {
@@ -39,10 +45,26 @@
 }
 
 .reviewSection-rating {
-  margin-left: auto;
   font-size: 14px;
   color: var(--primary);
   letter-spacing: 0.5px;
+}
+
+.reviewSection-writeBtn {
+  padding: 8px 16px;
+  background-color: #59664c;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 0;
+  transition: background-color 0.2s ease;
+}
+
+.reviewSection-writeBtn:hover {
+  background-color: #444f3a;
 }
 
 .reviewSection-message {

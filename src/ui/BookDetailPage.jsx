@@ -33,6 +33,21 @@ function BookDetailPage({
 
   const [bookData, setBookData] = useState(INITIAL_BOOK_DATA);
   const [pageLoading, setPageLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  const toastPosition = isMobile ? "bottom-center" : "top-right";
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     if (isCreate || !bookId) {
@@ -53,6 +68,7 @@ function BookDetailPage({
         if (!data) {
           toast.error("도서 정보를 불러오지 못했습니다.", {
             id: "book-detail-empty",
+            position: toastPosition,
           });
           return;
         }
@@ -71,6 +87,7 @@ function BookDetailPage({
         console.error(error);
         toast.error("도서 상세 정보를 불러오는 중 오류가 발생했습니다.", {
           id: "book-detail-fetch-error",
+          position: toastPosition,
         });
       } finally {
         if (!ignore) {
@@ -84,7 +101,7 @@ function BookDetailPage({
     return () => {
       ignore = true;
     };
-  }, [isCreate, bookId]);
+  }, [isCreate, bookId, toastPosition]);
 
   const handleSave = async () => {
     if (
@@ -92,19 +109,21 @@ function BookDetailPage({
       !bookData.author.trim() ||
       !bookData.content.trim()
     ) {
-      toast.error("제목, 저자, 내용을 모두 입력해주세요.");
+      toast.error("제목, 저자, 내용을 모두 입력해주세요.", {
+        position: toastPosition,
+      });
       return;
     }
 
-    try {
-      const bookPayload = {
-        title: bookData.title,
-        author: bookData.author,
-        genre: bookData.genre,
-        content: bookData.content,
-        coverImageUrl: bookData.coverImageUrl,
-      };
+    const bookPayload = {
+      title: bookData.title.trim(),
+      author: bookData.author.trim(),
+      genre: bookData.genre?.trim() || "",
+      content: bookData.content.trim(),
+      coverImageUrl: bookData.coverImageUrl || "",
+    };
 
+    try {
       if (isCreate) {
         const createdBook = await BookCreate({
           ...bookPayload,
@@ -112,48 +131,69 @@ function BookDetailPage({
         });
 
         if (!createdBook) {
-          toast.error("도서 등록에 실패했습니다.");
+          toast.error("도서 등록에 실패했습니다.", {
+            position: toastPosition,
+          });
           return;
         }
 
-        toast.success("도서가 성공적으로 등록되었습니다.");
+        toast.success("도서가 성공적으로 등록되었습니다.", {
+          position: toastPosition,
+        });
         onGoList();
         return;
       }
 
-      const updatedBook = await BookUpdate(bookId, bookPayload);
+      const updatedBook = await BookUpdate(bookId, {
+        ...bookPayload,
+        views: bookData.views || 0,
+      });
 
       if (!updatedBook) {
-        toast.error("도서 수정에 실패했습니다.");
+        toast.error("도서 수정에 실패했습니다.", {
+          position: toastPosition,
+        });
         return;
       }
 
-      toast.success("도서 정보가 수정되었습니다.");
+      toast.success("도서 정보가 수정되었습니다.", {
+        position: toastPosition,
+      });
       onGoList();
     } catch (error) {
       console.error(error);
-      toast.error("서버 통신 중 오류가 발생했습니다.");
+      toast.error("서버 통신 중 오류가 발생했습니다.", {
+        position: toastPosition,
+      });
     }
   };
 
   const executeDelete = async () => {
+    if (isCreate || !bookId) return;
+
     try {
       const success = await BookDelete(bookId);
 
       if (!success) {
-        toast.error("도서 삭제에 실패했습니다.");
+        toast.error("도서 삭제에 실패했습니다.", {
+          position: toastPosition,
+        });
         return;
       }
 
-      toast.success("도서가 삭제되었습니다.");
+      toast.success("도서가 삭제되었습니다.", {
+        position: toastPosition,
+      });
       onGoList();
     } catch (error) {
       console.error(error);
-      toast.error("삭제 중 서버 오류가 발생했습니다.");
+      toast.error("삭제 중 서버 오류가 발생했습니다.", {
+        position: toastPosition,
+      });
     }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (isCreate || !bookId) return;
 
     toast(
@@ -195,6 +235,7 @@ function BookDetailPage({
             }}
           >
             <button
+              type="button"
               onClick={() => toast.dismiss(t.id)}
               style={{
                 padding: "6px 12px",
@@ -210,6 +251,7 @@ function BookDetailPage({
             </button>
 
             <button
+              type="button"
               onClick={async () => {
                 toast.dismiss(t.id);
                 await executeDelete();
@@ -232,11 +274,12 @@ function BookDetailPage({
       ),
       {
         duration: Infinity,
-        position: "top-center",
+        position: toastPosition,
         style: {
           background: "transparent",
           boxShadow: "none",
           padding: 0,
+          margin: isMobile ? "0 0 20px 0" : "0",
         },
       }
     );
