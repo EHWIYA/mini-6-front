@@ -1,0 +1,47 @@
+<svg width="1024" height="1024" viewBox="220 150 650 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="coverGrad" x1="474" y1="240" x2="790" y2="604" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#A3AA61"/>
+      <stop offset="0.52" stop-color="#7F8E45"/>
+      <stop offset="1" stop-color="#62733A"/>
+    </linearGradient>
+    <linearGradient id="pageGrad" x1="301" y1="391" x2="600" y2="718" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFDF3"/>
+      <stop offset="1" stop-color="#EFE8D8"/>
+    </linearGradient>
+    <filter id="softShadow" x="180" y="170" width="700" height="650" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#0D1719" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#softShadow)">
+    <!-- dark base -->
+    <path d="M250 431C250 409.461 267.461 392 289 392H329V645H469C485 645 501 654 512 669C523 654 539 645 555 645H735V392H775C796.539 392 814 409.461 814 431V701C814 720.882 797.882 737 778 737H558C540 737 523 746 512 762C501 746 484 737 466 737H286C266.118 737 250 720.882 250 701V431Z" fill="#172427"/>
+
+    <!-- left page -->
+    <path d="M316 353C395 351 458 374 497 421V704C448 662 389 653 316 656C302.745 656 292 645.255 292 632V377C292 363.745 302.745 353 316 353Z" fill="url(#pageGrad)"/>
+    <path d="M316 353C395 351 458 374 497 421V704C448 662 389 653 316 656C302.745 656 292 645.255 292 632V377C292 363.745 302.745 353 316 353Z" stroke="#F7F2E7" stroke-width="8"/>
+    <path d="M319 617C384 610 438 620 490 656" stroke="#D8D1C2" stroke-width="5" stroke-linecap="round" opacity="0.55"/>
+
+    <!-- right visible page -->
+    <path d="M527 515C577 496 645 501 711 530V651H557C542 651 526 662 512 690V536C516 527 521 520 527 515Z" fill="#F8F3E7"/>
+    <path d="M532 636C588 625 645 628 704 644" stroke="#D8D1C2" stroke-width="5" stroke-linecap="round" opacity="0.48"/>
+
+    <!-- cover sleeve dark edge -->
+    <path d="M455 293C458 271 477 255 499 258L751 289C774 292 791 311 794 334L830 594C834 623 812 648 783 645L533 616C508 613 490 593 488 568L455 293Z" fill="#263723"/>
+
+    <!-- olive cover -->
+    <path d="M480 268C484 250 500 237 519 240L765 271C788 274 806 292 809 315L844 575C848 604 825 628 797 625L548 595C524 592 505 573 503 549L480 268Z" fill="url(#coverGrad)"/>
+    <path d="M480 268C484 250 500 237 519 240L765 271C788 274 806 292 809 315L844 575C848 604 825 628 797 625L548 595C524 592 505 573 503 549L480 268Z" stroke="#314024" stroke-width="4"/>
+    <path d="M505 279L527 283L534 546" stroke="#C7D281" stroke-width="9" stroke-linecap="round" opacity="0.86"/>
+
+    <!-- cover bottom page edge -->
+    <path d="M541 590H756C766 590 775 598 775 608C775 618 766 626 756 626H532C516 626 503 613 503 597C503 587 509 578 517 574C522 584 531 590 541 590Z" fill="#F6F1E5" stroke="#263723" stroke-width="7"/>
+
+    <!-- center fold -->
+    <path d="M512 682C507 664 502 643 497 621V704C503 713 507 722 512 736C517 722 521 713 527 704V621C522 643 517 664 512 682Z" fill="#F3ECDD"/>
+  </g>
+
+  <!-- AI sparkle -->
+  <path d="M735 180C745 225 758 238 803 248C758 258 745 271 735 316C725 271 712 258 667 248C712 238 725 225 735 180Z" fill="#83934B" stroke="#5F6E38" stroke-width="4"/>
+</svg>
