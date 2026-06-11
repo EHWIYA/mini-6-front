@@ -11,6 +11,8 @@ function BookForm({
   onSave,
   onDelete,
   isSaving = false,
+  genreFeedback = null,
+  onClearGenreFeedback,
 }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,6 +34,8 @@ function BookForm({
       genreId,
       isNewGenre,
     }));
+
+    onClearGenreFeedback?.();
   };
 
   const handleSubmit = (e) => {
@@ -75,6 +79,16 @@ function BookForm({
             />
           </div>
         </div>
+
+        {genreFeedback?.message && (
+          <div
+            className={`book-form-genre-feedback ${genreFeedback.type || "info"}`}
+            role={genreFeedback.type === "error" ? "alert" : "status"}
+          >
+            <strong>{genreFeedback.title}</strong>
+            <p>{genreFeedback.message}</p>
+          </div>
+        )}
 
         <Input
           label="저자:"

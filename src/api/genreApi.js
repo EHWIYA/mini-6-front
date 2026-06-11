@@ -11,6 +11,14 @@ export class GenreApiError extends Error {
   }
 }
 
+export const isNetworkError = (error) => {
+  return (
+    error instanceof TypeError ||
+    error?.message === "Failed to fetch" ||
+    error?.message === "NetworkError when attempting to fetch resource."
+  );
+};
+
 const parseErrorPayload = async (response) => {
   const contentType = response.headers.get("content-type") || "";
 
@@ -84,6 +92,26 @@ export const isGenreAlreadyExistsError = (error) => {
     error?.code === "GENRE_ALREADY_EXISTS" ||
     payloadText.includes("GENRE_ALREADY_EXISTS")
   );
+};
+
+export const getGenreErrorMessage = (error, fallbackMessage) => {
+  if (isNetworkError(error)) {
+    return "서버에 연결할 수 없습니다. 서버가 실행 중인지 확인해주세요.";
+  }
+
+  if (isGenreAlreadyExistsError(error)) {
+    return "이미 존재하는 장르입니다. 장르 목록에서 다시 선택해주세요.";
+  }
+
+  if (error?.status === 400) {
+    return error.message || "장르 입력 값을 확인해주세요.";
+  }
+
+  if (error?.status >= 500) {
+    return "서버에서 장르를 처리하는 중 오류가 발생했습니다.";
+  }
+
+  return error?.message || fallbackMessage;
 };
 
 export const GenreList = getGenres;

@@ -126,6 +126,12 @@
   line-height: 1.5;
 }
 
+.genre-modal-state strong {
+  color: var(--error, #c97020);
+  font-size: 15px;
+  font-weight: 900;
+}
+
 .genre-modal-state-error p {
   color: var(--error, #c97020);
 }

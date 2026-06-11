@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
 import Fuse from "fuse.js";
 import Filter from "badwords-ko";
-import { getGenres } from "../../../api/genreApi";
+import { getGenreErrorMessage, getGenres } from "../../../api/genreApi";
 import "./GenreModal.css";
 
 const getGenreName = (genre) => {
@@ -89,7 +89,7 @@ function GenreModal({ selectedGenre, onSelectGenre, onClose }) {
       setGenres(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error(error);
-      setLoadError("장르 목록을 불러오지 못했습니다.");
+      setLoadError(getGenreErrorMessage(error, "장르 목록을 불러오지 못했습니다."));
     } finally {
       setIsLoading(false);
     }
@@ -110,7 +110,7 @@ function GenreModal({ selectedGenre, onSelectGenre, onClose }) {
         if (ignore) return;
 
         console.error(error);
-        setLoadError("장르 목록을 불러오지 못했습니다.");
+        setLoadError(getGenreErrorMessage(error, "장르 목록을 불러오지 못했습니다."));
       } finally {
         if (!ignore) {
           setIsLoading(false);
@@ -263,6 +263,7 @@ function GenreModal({ selectedGenre, onSelectGenre, onClose }) {
     if (loadError) {
       return (
         <div className="genre-modal-state genre-modal-state-error" role="alert">
+          <strong>장르 목록 조회 실패</strong>
           <p>{loadError}</p>
           <button
             type="button"
