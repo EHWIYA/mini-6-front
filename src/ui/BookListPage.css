@@ -51,6 +51,60 @@
   padding: 14px 40px;
 }
 
+.bookListPage-genre-filter {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+}
+
+.bookListPage-genre-button {
+  min-width: 132px;
+  height: 52px;
+  padding: 0 20px;
+  gap: 8px;
+  font-size: var(--font-body);
+}
+
+.bookListPage-genre-filter.is-selected .bookListPage-genre-button {
+  min-width: 154px;
+  padding-right: 46px;
+}
+
+.bookListPage-genre-button .genre-select-arrow {
+  font-size: 13px;
+}
+
+.bookListPage-genre-clear {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  z-index: 1;
+  transform: translateY(-50%);
+
+  width: 24px;
+  height: 24px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--text-white, #ffffff);
+
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1;
+
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+
+.bookListPage-genre-clear:hover {
+  background: rgba(255, 255, 255, 0.32);
+}
+
 .bookListPage-empty {
   margin: 60px 0;
   text-align: center;
@@ -87,6 +141,22 @@
 }
 
 @media (max-width: 767px) {
+  .bookListPage-search {
+    align-items: stretch;
+  }
+
+  .bookListPage-search-input {
+    max-width: none;
+  }
+
+  .bookListPage-search-button {
+    flex: 1 1 150px;
+  }
+
+  .bookListPage-search-button .comButton-main {
+    width: 100%;
+  }
+
   .bookListPage-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 20px 16px;

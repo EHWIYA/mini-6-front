@@ -10,9 +10,23 @@ const getGenreName = (genre) => {
   return genre?.name || "";
 };
 
-function GenreSelector({ selectedGenre, onSelectGenre }) {
+function GenreSelector({
+  selectedGenre,
+  onSelectGenre,
+  allowCustomGenre = true,
+  className = "",
+  modalTitle,
+  modalDescription,
+}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const selectedGenreName = getGenreName(selectedGenre);
+  const buttonClassName = [
+    "genre-select-button",
+    selectedGenreName ? "selected" : "",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   const handleSelectGenre = (genre) => {
     onSelectGenre(genre);
@@ -23,7 +37,7 @@ function GenreSelector({ selectedGenre, onSelectGenre }) {
     <>
       <button
         type="button"
-        className={`genre-select-button ${selectedGenreName ? "selected" : ""}`}
+        className={buttonClassName}
         onClick={() => setIsModalOpen(true)}
       >
         <span>{selectedGenreName || "장르 선택"}</span>
@@ -35,6 +49,9 @@ function GenreSelector({ selectedGenre, onSelectGenre }) {
           selectedGenre={selectedGenre}
           onSelectGenre={handleSelectGenre}
           onClose={() => setIsModalOpen(false)}
+          allowCustomGenre={allowCustomGenre}
+          title={modalTitle}
+          description={modalDescription}
         />
       )}
     </>
