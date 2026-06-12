@@ -15,6 +15,36 @@
   flex: 1;
 }
 
+.header-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+
+.header-brand:hover,
+.header-brand:focus-visible {
+  opacity: 0.9;
+}
+
+.header-brand:focus-visible {
+  outline: 2px solid var(--text-white);
+  outline-offset: 0.35rem;
+  border-radius: 0.25rem;
+}
+
+.header-logo {
+  width: 3rem;
+  height: 3rem;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
 .header--main {
   border-bottom-left-radius: 1.5rem;
   border-bottom-right-radius: 1.5rem;
