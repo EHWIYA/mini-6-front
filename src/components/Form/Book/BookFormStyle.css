@@ -71,10 +71,11 @@
 .book-form-genre-feedback {
   padding: 12px 14px;
 
-  border: 1px solid rgba(101, 112, 42, 0.22);
-  border-radius: 12px;
-  background: rgba(101, 112, 42, 0.08);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
   color: var(--text-main);
+  box-shadow: var(--shadow-soft);
 }
 
 .book-form-genre-feedback strong {
@@ -122,9 +123,10 @@
 
   padding: 0 16px;
 
-  border: 1px solid var(--text-placeholder);
-  border-radius: 10px;
-  background: var(--bg-main, #ffffff);
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-md);
+  background: var(--bg-input);
+  box-shadow: var(--shadow-pressed);
 
   color: var(--text-main);
   font-size: var(--font-small);
@@ -140,7 +142,8 @@
 }
 
 .book-form-title-input:focus {
-  border-color: var(--primary, #65702a);
+  border-color: rgba(101, 114, 58, 0.52);
+  box-shadow: var(--shadow-pressed), var(--shadow-focus);
 }
 
 .book-form .input-large {
@@ -170,15 +173,37 @@
 }
 
 .book-form-actions .delete-button {
-  background: var(--error);
+  background:
+    linear-gradient(145deg, #e18b40, var(--error));
   color: var(--text-white);
 }
 
 .book-form-actions .delete-button:hover:not(:disabled) {
-  background: #c97020;
+  background:
+    linear-gradient(145deg, #e99852, #c97020);
 }
 
 .book-form-actions .delete-button:disabled {
   background: #daa06a;
   opacity: 0.6;
+}
+
+@media (max-width: 767px) {
+  .book-form-title-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .book-form-title-row .genre-select-button {
+    width: 100%;
+  }
+
+  .book-form-actions {
+    transform: none;
+    flex-wrap: wrap;
+  }
+
+  .book-form-actions .comButton-main {
+    width: 100%;
+  }
 }

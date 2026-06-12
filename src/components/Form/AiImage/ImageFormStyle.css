@@ -75,9 +75,11 @@
   align-items: center;
   justify-content: center;
 
-  border: 1.5px solid var(--border-card);
-  border-radius: 10px;
-  background-color: var(--bg-input);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(145deg, var(--bg-card), var(--color-surface-raised));
+  box-shadow: var(--shadow-pressed);
 
   overflow: hidden;
   box-sizing: border-box;
@@ -110,6 +112,7 @@
   font-size: var(--font-small);
   font-weight: 600;
   line-height: 1.5;
+  background: rgba(255, 255, 247, 0.22);
 }
 
 .image-form-placeholder p {
@@ -144,6 +147,7 @@
   border: 4px solid var(--secondary);
   border-top-color: var(--primary);
   border-radius: 50%;
+  box-shadow: var(--shadow-soft);
   animation: imageFormSpin 0.8s linear infinite;
 }
 
@@ -177,6 +181,10 @@
 .image-form-footer .comButton-sub {
   white-space: nowrap;
   flex-shrink: 0;
+}
+
+:root[data-theme="dark"] .image-form-placeholder {
+  background: rgba(91, 106, 68, 0.12);
 }
 
 /* 모바일 (768px 미만) */

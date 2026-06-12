@@ -2,7 +2,9 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: var(--bg-page);
+  background:
+    radial-gradient(circle at 10% 0%, rgba(215, 226, 160, 0.28), transparent 28%),
+    var(--bg-page);
 }
 
 .bookListPage-main {
@@ -28,14 +30,16 @@
   padding: 0 20px;
   box-sizing: border-box;
 
-  border: 1.5px solid var(--border-input);
-  border-radius: 12px;
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-md);
   background-color: var(--bg-input);
+  box-shadow: var(--shadow-pressed);
 
   color: var(--text-main);
   font-size: var(--font-body);
   font-weight: 600;
   outline: none;
+  transition: var(--transition-surface);
 }
 
 .bookListPage-search-input::placeholder {
@@ -43,7 +47,8 @@
 }
 
 .bookListPage-search-input:focus {
-  border-color: var(--success);
+  border-color: rgba(95, 141, 56, 0.52);
+  box-shadow: var(--shadow-pressed), var(--shadow-focus);
 }
 
 .bookListPage-search-button .comButton-main {
@@ -88,7 +93,7 @@
   align-items: center;
   justify-content: center;
 
-  border: 1px solid rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.56);
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.18);
   color: var(--text-white, #ffffff);
@@ -99,6 +104,9 @@
 
   cursor: pointer;
   transition: 0.15s ease;
+  box-shadow:
+    3px 3px 7px rgba(45, 55, 24, 0.22),
+    -2px -2px 6px rgba(255, 255, 255, 0.16);
 }
 
 .bookListPage-genre-clear:hover {
@@ -132,12 +140,20 @@
 }
 
 .bookListPage-sort select {
-  padding: 7px 8px;
-  border: 1px solid #b8be8f;
-  border-radius: 6px;
-  background-color: #fff;
-  color: #343b23;
+  padding: 8px 12px;
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-input);
+  color: var(--text-main);
   font-size: 15px;
+  font-weight: 700;
+  box-shadow: var(--shadow-soft);
+}
+
+:root[data-theme="dark"] .bookListPage {
+  background:
+    radial-gradient(circle at 10% 0%, rgba(74, 87, 54, 0.32), transparent 28%),
+    var(--bg-page);
 }
 
 @media (max-width: 767px) {

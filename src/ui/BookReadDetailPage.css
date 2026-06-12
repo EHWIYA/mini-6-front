@@ -2,6 +2,9 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background:
+    radial-gradient(circle at 90% 8%, rgba(215, 226, 160, 0.26), transparent 30%),
+    var(--bg-page);
 }
 
 .bookReadDetailPage-main {
@@ -39,10 +42,12 @@
 .bookReadDetailPage-coverArea {
   width: 100%;
   border: 1px solid var(--border-main);
-  border-radius: 8px;
-  background-color: var(--bg-input);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(145deg, var(--color-surface-raised), var(--bg-card));
   padding: 20px;
   box-sizing: border-box;
+  box-shadow: var(--shadow-raised);
 }
 
 .bookReadDetailPage-cover {
@@ -50,12 +55,20 @@
   width: 100%;
   aspect-ratio: 3 / 4;
   object-fit: cover;
-  border-radius: 6px;
-  background-color: var(--bg-main);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-card);
+  box-shadow: var(--shadow-pressed);
 }
 
 .bookReadDetailPage-info {
   min-width: 0;
+  padding: 28px;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 247, 0.64), rgba(242, 246, 232, 0.86)),
+    var(--bg-card);
+  box-shadow: var(--shadow-raised);
 }
 
 .bookReadDetailPage-title {
@@ -78,6 +91,10 @@
   grid-template-columns: 80px 1fr;
   column-gap: 16px;
   align-items: start;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background-color: rgba(255, 255, 247, 0.28);
+  box-shadow: var(--shadow-soft);
 }
 
 .bookReadDetailPage-metaItem dt {
@@ -93,8 +110,11 @@
 }
 
 .bookReadDetailPage-description {
-  border-top: 1px solid var(--border-main);
-  padding-top: 24px;
+  border-top: 0;
+  padding: 22px;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-input);
+  box-shadow: var(--shadow-pressed);
 }
 
 .bookReadDetailPage-description h3 {
@@ -120,36 +140,66 @@
 
 .bookReadDetailPage-button {
   border: 0;
-  border-radius: 6px;
-  background-color: var(--primary);
+  border-radius: 999px;
+  background:
+    linear-gradient(145deg, #758243, var(--primary));
   color: var(--text-white);
   padding: 8px 18px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 800;
   cursor: pointer;
   min-height: 36px;
+  box-shadow: var(--shadow-soft);
+  transition: var(--transition-surface);
 }
 
 .bookReadDetailPage-button:hover {
-  background-color: #49501e;
+  background:
+    linear-gradient(145deg, #808e4a, var(--primary));
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-raised);
+}
+
+.bookReadDetailPage-button:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-pressed);
 }
 
 .bookReadDetailPage-button--like {
-  background-color: rgb(35, 165, 216);
+  background:
+    linear-gradient(145deg, #78904b, #5f7f38);
 }
 
 .bookReadDetailPage-button--like:hover {
-  background-color: #963847;
+  background:
+    linear-gradient(145deg, #85a052, #67883e);
 }
 
 .bookReadDetailPage-button--secondary {
-  background-color: transparent;
+  background-color: var(--bg-card);
+  background-image: none;
   border: 1px solid var(--border-main);
   color: var(--text-main);
 }
 
 .bookReadDetailPage-button--secondary:hover {
   background-color: var(--bg-input);
+}
+
+:root[data-theme="dark"] .bookReadDetailPage-info {
+  background:
+    linear-gradient(145deg, rgba(45, 53, 36, 0.94), rgba(30, 36, 25, 0.86)),
+    var(--bg-card);
+}
+
+:root[data-theme="dark"] .bookReadDetailPage {
+  background:
+    radial-gradient(circle at 90% 8%, rgba(74, 87, 54, 0.32), transparent 30%),
+    var(--bg-page);
+}
+
+:root[data-theme="dark"] .bookReadDetailPage-metaItem {
+  background-color: rgba(91, 106, 68, 0.14);
 }
 
 @media (max-width: 900px) {
