@@ -1,4 +1,5 @@
-const API_BASE_URL = "http://47.128.222.99:8080";
+import { API_BASE_URL } from "./apiConfig";
+
 const GENRE_BASE_URL = `${API_BASE_URL}/genres`;
 
 export class GenreApiError extends Error {

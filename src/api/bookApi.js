@@ -1,4 +1,6 @@
-const BASE_URL = "http://47.128.222.99:8080/books";
+import { API_BASE_URL } from "./apiConfig";
+
+const BASE_URL = `${API_BASE_URL}/books`;
 const OLD_BOOK_LIKES_STORAGE_KEY = "bookLikes";
 const inFlightRequests = new Map();
 

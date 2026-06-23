@@ -1,6 +1,7 @@
 import { parseErrorMessage, parseJsonResponse } from "./httpUtils";
+import { API_BASE_URL } from "./apiConfig";
 
-const BASE_URL = "http://47.128.222.99:8080";
+const BASE_URL = API_BASE_URL;
 
 const JSON_HEADERS = {
   "Content-Type": "application/json",
