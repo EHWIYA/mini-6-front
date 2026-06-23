@@ -1,6 +1,6 @@
 import { parseErrorMessage, parseJsonResponse } from "./httpUtils";
 
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = "http://47.128.222.99:8080";
 
 const JSON_HEADERS = {
   "Content-Type": "application/json",

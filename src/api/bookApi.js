@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:8080/books";
+const BASE_URL = "http://47.128.222.99:8080/books";
 const OLD_BOOK_LIKES_STORAGE_KEY = "bookLikes";
 const inFlightRequests = new Map();
 
