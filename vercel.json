@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "http://team-14-backend-alb-256967163.ap-southeast-1.elb.amazonaws.com/:path*"
+      "destination": "http://47.128.222.99:8080/:path*"
     }
   ]
 }
